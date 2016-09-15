@@ -1,0 +1,37 @@
+importFrom(R.methodsS3, setMethodS3, throw)
+importFrom(R.oo, setConstructorS3, extend, Object)
+import(R.utils, MASS)
+
+export(addNewSample.TMLCARA, addNewSample,
+       as.character, as.character.TMLCARA,
+       expit,
+       getCvControl, getCvControl.TMLCARA,
+       getGmin, getGmin.TMLCARA,
+       getGstar, getGstar.TMLCARA,
+       getHistory, getHistory.TMLCARA,
+       getNodes, getNodes.TMLCARA,
+       getObs, getObs.TMLCARA,
+       getOptTm,
+       getOptVar,
+       getPsi, getPsi.TMLCARA,
+       getPsi.sd, getPsi.sd.TMLCARA,
+       getRegret, getRegret.TMLCARA,
+       getRegret.sd, getRegret.sd.TMLCARA,
+       getQ, getQ.TMLCARA,
+       getSample,
+       logit,
+       makeLearnQ,
+       makeLearnQ.piecewise,
+       oneOne,
+       plot, plot.TMLCARA,
+       print.history,
+       QbarSJoS,
+       QbarBandit, QbarBandit2, QbarBandit3,
+       ruleQbar,
+       targetPsi.TMLCARA, targetPsi,
+       tml.cara.rct,
+       TMLCARA,
+       update.TMLCARA, update,
+       VbarSJoS,
+       VbarBandit)
+

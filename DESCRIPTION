@@ -1,0 +1,14 @@
+Package: tml.cara.rct
+Type: Package
+Title: Targeted Minimum Loss Covariate-Adjusted Response-Adaptive RCT design and statistical analysis
+Version: 0.0.4
+Date: 2016-02-05
+Author: Antoine Chambaz, Wenjing Zheng
+Maintainer: Antoine Chambaz <achambaz@u-paris10.fr>
+Description: For our personal use only
+License: GPL
+LazyLoad: yes
+LazyData: yes
+Depends: R (>= 2.9.0), R.utils (>= 1.4.1), glmnet (>= 1.9-5)
+Imports: R.methodsS3, R.oo
+Suggests: SuperLearner (>= 2.0), e1071 (>= 1.5.24), randomForest (>= 4.5-35), polspline (>= 1.1.4), gam (>= 1.03)
