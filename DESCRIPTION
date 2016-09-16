@@ -1,11 +1,11 @@
-Package: tml.cara.rct
+Package: tsml.cara.rct
 Type: Package
-Title: Targeted Minimum Loss Covariate-Adjusted Response-Adaptive RCT design and statistical analysis
+Title: Targeted Sequential Minimum Loss Covariate-Adjusted Response-Adaptive RCT design and statistical inference
 Version: 0.0.4
-Date: 2016-02-05
-Author: Antoine Chambaz, Wenjing Zheng
+Date: 2016-09-16
+Author: Antoine Chambaz
 Maintainer: Antoine Chambaz <achambaz@u-paris10.fr>
-Description: For our personal use only
+Description: The package allows to simulate easily a targeted sequential minimum loss covariate-adjusted response-adaptive randomized clinical trial design sampling and that statistical inference of the average treatment effect or mean reward of the optimal treatment rule
 License: GPL
 LazyLoad: yes
 LazyData: yes
