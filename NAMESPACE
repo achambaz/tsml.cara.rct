@@ -1,37 +1,35 @@
-importFrom(R.methodsS3, setMethodS3, throw)
-importFrom(R.oo, setConstructorS3, extend, Object)
-import(R.utils, MASS)
+import(R.utils)
 
-export(addNewSample.TMLCARA, addNewSample,
-       as.character, as.character.TMLCARA,
-       expit,
-       getCvControl, getCvControl.TMLCARA,
-       getGmin, getGmin.TMLCARA,
-       getGstar, getGstar.TMLCARA,
-       getHistory, getHistory.TMLCARA,
-       getNodes, getNodes.TMLCARA,
-       getObs, getObs.TMLCARA,
+importFrom(R.methodsS3, setMethodS3, throw)
+importFrom(R.oo, setConstructorS3, extend, Object, getHistory)
+importFrom(graphics, plot)
+
+S3method(as.character, TSMLCARA)
+S3method(getHistory, TSMLCARA)
+S3method(getObs, TSMLCARA)
+S3method(getPsi, TSMLCARA)
+S3method(getPsiSd, TSMLCARA)
+S3method(getRegret, TSMLCARA)
+S3method(getRegretSd, TSMLCARA)
+S3method(plot, TSMLCARA)
+S3method(setConfLevel, TSMLCARA)
+
+export(as.character, as.character.TSMLCARA,
+       getHistory, getHistory.TSMLCARA,
+       getObs, getObs.TSMLCARA,
        getOptTm,
        getOptVar,
-       getPsi, getPsi.TMLCARA,
-       getPsi.sd, getPsi.sd.TMLCARA,
-       getRegret, getRegret.TMLCARA,
-       getRegret.sd, getRegret.sd.TMLCARA,
-       getQ, getQ.TMLCARA,
+       getPsi, getPsi.TSMLCARA,
+       getPsiSd, getPsiSd.TSMLCARA,
+       getRegret, getRegret.TSMLCARA,
+       getRegretSd, getRegretSd.TSMLCARA,
        getSample,
-       logit,
        makeLearnQ,
        makeLearnQ.piecewise,
        oneOne,
-       plot, plot.TMLCARA,
-       print.history,
-       QbarSJoS,
-       QbarBandit, QbarBandit2, QbarBandit3,
+       plot, plot.TSMLCARA,
+       printHistory,
+       Qbar1, Qbar2,
        ruleQbar,
-       targetPsi.TMLCARA, targetPsi,
-       tml.cara.rct,
-       TMLCARA,
-       update.TMLCARA, update,
-       VbarSJoS,
-       VbarBandit)
-
+       tsml.cara.rct,
+       Vbar1, Vbar2)

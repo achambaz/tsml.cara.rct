@@ -1,0 +1,25 @@
+validateArgumentObs <- function(obs) {
+  if (!is.data.frame(obs)) {
+    throw("Argument 'obs' should be a matrix")
+  }
+  
+  ## Ensuring that columns 'G', 'A' and 'Y' are present
+  varNames <- c("G", "A", "Y")
+  nms <- colnames(obs)
+  m <- match(varNames, nms)
+  if (nrow(obs)>0) {
+    idxs <- which(is.na(m))
+    if (length(idxs)) {
+      throw("Missing column:", varNames[idxs])
+    }
+  }
+  
+  obs
+}
+
+############################################################################
+## HISTORY:
+## 2014-02-26
+## o Created.
+############################################################################
+

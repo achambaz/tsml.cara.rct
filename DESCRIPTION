@@ -1,14 +1,15 @@
 Package: tsml.cara.rct
 Type: Package
-Title: Targeted Sequential Minimum Loss Covariate-Adjusted Response-Adaptive RCT design and statistical inference
-Version: 0.0.4
+Title: Targeted Sequential Minimum Loss CARA RCT Design and Inference
+Version: 0.1.0
 Date: 2016-09-16
-Author: Antoine Chambaz
+Authors@R: person("Antoine", "Chambaz", role=c("aut", "cre"), email="achambaz@u-paris10.fr")
+Author: Antoine Chambaz [aut, cre]
 Maintainer: Antoine Chambaz <achambaz@u-paris10.fr>
-Description: The package allows to simulate easily a targeted sequential minimum loss covariate-adjusted response-adaptive randomized clinical trial design sampling and that statistical inference of the average treatment effect or mean reward of the optimal treatment rule
+Description: Simulation of a targeted sequential minimum loss covariate-adjusted response-adaptive (CARA) randomized clinical trial (RCT) design sampling and statistical inference of the average treatment effect or mean reward of the optimal treatment rule.
 License: GPL
 LazyLoad: yes
 LazyData: yes
-Depends: R (>= 2.9.0), R.utils (>= 1.4.1), glmnet (>= 1.9-5)
+Depends: R (>= 2.9.0), R.utils (>= 1.4.1)
 Imports: R.methodsS3, R.oo
-Suggests: SuperLearner (>= 2.0), e1071 (>= 1.5.24), randomForest (>= 4.5-35), polspline (>= 1.1.4), gam (>= 1.03)
+Suggests: glmnet (>= 1.9-5)
