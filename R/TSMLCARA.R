@@ -862,7 +862,7 @@ setMethodS3("updateHistory", "TSMLCARA", function(#Updates History of a TSMLECAR
       hh <- rbind(hh, c(nobs=nrow(getObs(this)), psi=getPsi(this), psi.sd=getPsiSd(this)))
     } else if (what=="MOR") {
       hh <- rbind(hh, c(nobs=nrow(getObs(this)), psi=getPsi(this), psi.sd=getPsiSd(this),
-                        regret=getRegret(this), regret.sd=getRegret.sd(this)))      
+                        regret=getRegret(this), regret.sd=getRegretSd(this)))      
     }
     rownames(hh) <- c(rownames.hh, nm)
     history$hist <- hh

@@ -1,5 +1,5 @@
 targetTm.glm <- function(formula, data, weights,
-                         link,##=targetLink,
+                         link,
                          subset, na.action, start = NULL,
                          etastart, mustart, offset,
                          control = list(...),
