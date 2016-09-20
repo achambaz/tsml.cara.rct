@@ -129,11 +129,7 @@ estimateQ  <-  function(#Estimates  the  Conditional Expectation  of  Y  Given (
 
 ############################################################################
 ## HISTORY:
-## 2016-02-05
-## o Added pmin(., pmax(., ))
-## 2014-06-13
-## o Adapted to deal with option 'MOR'
-## 2014-02-26
+## 2016-09-16
 ## o Created.
 ############################################################################
 

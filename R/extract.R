@@ -49,9 +49,7 @@ extractAW <- function(#Removes the G,  Y, Y1 and Y0 Columns from Data.Frame of O
 
 ############################################################################
 ## HISTORY:
-## 2016-02-08
-## o Adaptation to remove new columns "Y1" and "Y0"
-## 2014-02-26
+## 2016-09-16
 ## o Created.
 ############################################################################
 

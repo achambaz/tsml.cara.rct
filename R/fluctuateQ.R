@@ -87,9 +87,7 @@ fluctuateQ  <-  function(#Fluctuates  the  Conditional Expectation  of  Y  Given
 
 ############################################################################
 ## HISTORY:
-## 2014-06-13
-## o Adapted to deal with option 'MOR'
-## 2014-02-26
+## 2016-09-16
 ## o Created.
 ############################################################################
 

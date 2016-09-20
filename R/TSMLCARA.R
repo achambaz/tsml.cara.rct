@@ -1117,16 +1117,7 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
 
 ############################################################################
 ## HISTORY:
-## 2016-02-05
-## o Added 'regret' and 'regret.sd' entries to TSMLCARA object
-## o Added 'getRegret' and 'getRegret.sd'
-## o Adapted 'plot' function, among others
-## 2014-06-10
-## o Added 'what', 'Gexpl', 'threxpl' to include the estimation of the optimal
-## treatment rule 
-## 2014-03-25
-## o Removed 'wExpand', 'covLegendre', 'degLeg' and related stuff 
-## 2014-02-26
+## 2016-09-16
 ## o Created.
 ############################################################################
 

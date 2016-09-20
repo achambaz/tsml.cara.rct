@@ -746,13 +746,7 @@ makeLearnQ.piecewise <- function#Builds a Parametric Model Based on Sample Size
 
 ############################################################################
 ## HISTORY:
-## 2016-02-05
-## o Added 'ruleQbar', 'makeLearnQ'
-## 2014-04-01
-## o Added 'getOptTm' and 'getOptVar'
-## 2014-03-25
-## o Removed 'LegendreExpandCov'
-## 2014-02-26
+## 2016-09-16
 ## o Created.
 ############################################################################
 

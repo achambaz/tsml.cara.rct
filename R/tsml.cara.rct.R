@@ -765,11 +765,7 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
 
 ############################################################################
 ## HISTORY:
-## 2014-06-13
-## o Adapted to deal with option 'MOR'
-## 2014-03-25
-## o Removed 'wExpand', 'covLegendre', 'degLeg' and related stuff
-## 2014-02-26
+## 2016-09-16
 ## o Created.
 ############################################################################
 

@@ -99,9 +99,7 @@ estimatePsi  <-  function(#Computes the Targeted Minimum Loss Estimator of Psi.
 
 ############################################################################
 ## HISTORY:
-## 2014-06-13
-## o Adapted to deal with option 'MOR'
-## 2014-02-26
+## 2016-09-16
 ## o Created.
 ############################################################################
 
