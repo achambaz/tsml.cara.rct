@@ -2,9 +2,9 @@ setConstructorS3("TSMLCARA", function(#Creates a TSMLCARA Object.
 ### Creates a TSMLCARA object.
                                      what=c("ATE", "MOR"),
 ### A  \code{character}  indicating the  parameter  of  interest to  estimate.
-### Either 'ATE' for  the difference between the means  under '\eqn{A<-1}' and
-### '\eqn{A<-0}'  or 'MOR'  for  the  mean under  the  optimal treatment  rule
-### '\eqn{A<-r(W)}'.
+### Either "ATE" for the Average  Treatment Effect, the difference between the
+### means under  '\eqn{do(A=1)}' and  '\eqn{do(A=0)}', or  "MOR" for  the Mean
+### under the Optimal treatment Rule '\eqn{do(A=r(W))}'.
                                      obs=data.frame(matrix(nrow=0, ncol=4, dimnames=list(NULL, c("W", "G", "A", "Y")))),
 ### A  \code{data.frame}  of  observations,  as  produced  by  \code{function}
 ### \code{getSample}.
@@ -13,25 +13,25 @@ setConstructorS3("TSMLCARA", function(#Creates a TSMLCARA Object.
 ### object. Defaults to 'oneOne', the balanced treatment mechanism. 
                                      Gmin=1e-2,
 ### A  small positive  \code{numeric}, with  default value  \code{1e-2}.  When
-### \code{what} equals 'ATE', it is  the minimum value of elements of the
+### \code{what}  equals "ATE",  it is  the minimum  value of  elements of  the
 ### parametric  model \eqn{{\cal  G}}  of treatment  mechanisms (see  argument
-### \code{tm.model}).  The  maximal value is  \code{1-Gmin}.  When \code{what}
-### equals 'MOR', it  is the minimum value of  the conditional probability
-### of \eqn{A<-r_n(W)} given \eqn{W}.
+### \code{tm.model}).  The  maximum value is \code{1-Gmin}.   When \code{what}
+### equals "MOR",  it is the minimum  value of the conditional  probability of
+### \eqn{do(A=r_n(W))} given \eqn{W}.
                                      Gexpl=1e-2,
 ### A small positive \code{numeric}, with default value \code{1e-2}, only used
-### when  \code{what} equals  'MOR',  in which  case  it lower-bounds  the
-### conditional  probability  of  \eqn{A<-1-r_n(W)}  given  \eqn{W}.
+### when  \code{what}  equals  "MOR",  in   which  case  it  lower-bounds  the
+### conditional probability of \eqn{do(A=1-r_n(W))} given \eqn{W}.
                                      threxpl=1e-2,
 ### Either a small positive \code{numeric}, with default value \code{1e-2}, or
-### a  function of  sample  size giving  such  small numbers,  only used  when
-### \code{what}  equals 'MOR'.  If  \eqn{0\in[Q_n-\theta,Q_n+\theta]} with
+### a  function of  sample  size giving  such small  numbers,  only used  when
+### \code{what}  equals  "MOR".    If  \eqn{0\in[Q_n-\theta,Q_n+\theta]}  with
 ### \eqn{\theta} equal  to \code{threxpl} then \eqn{r_n(W)}  is the proportion
-### of the interval which lies  above 0, thresholded at levels \code{Gmin} and
+### of the interval which lies above  0, thresholded at levels \code{Gmin} and
 ### \code{1-Gmin}.
                                      Qmin=0,
 ### A  small positive  \code{numeric}, the  minimum value  of  scaled outcomes
-### \eqn{Y}. The maximal value is \code{1-Qmin}.
+### \eqn{Y}. The maximum value is \code{1-Qmin}.
                                      flavor=c("parametric", "lasso"), 
 ### A  \code{character}  indicating  the   flavor  of  the  procedure,  either
 ### 'parametric' or 'lasso'.
@@ -464,7 +464,7 @@ setMethodS3("setGmin", "TSMLCARA", function(#Sets Value of 'Gmin'.
 ### An object of class \code{TSMLCARA}.
     Gmin,
 ### A \code{numeric},  the minimal value  of elements of the  parametric model
-### \eqn{{\cal   G}}   of  treatment   mechanisms.   The   maximal  value   is
+### \eqn{{\cal   G}}   of  treatment   mechanisms.   The   maximum  value   is
 ### \code{1-Gmin}.
     ...
 ### Not used.
@@ -492,7 +492,7 @@ setMethodS3("setGexpl", "TSMLCARA", function(#Sets Value of 'Gexpl'.
 ### An object of class \code{TSMLCARA}.
     Gexpl,
 ### A  \code{numeric},  the  minimal  value  the  conditional  probability  of
-### \eqn{A<-1-d_n(W)} given \eqn{W}.
+### \eqn{do(A=1-r_n(W))} given \eqn{W}.
     ...
 ### Not used.
     ) {
@@ -885,18 +885,19 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
 (x,
 ### An object of class \code{TSMLCARA}.
  truth=NULL,
-### Defaults to \code{NULL}. When estimating the risk difference ('what' equal
-### to "ATE"), can be set to a  \code{numeric}, the true value of the targeted
-### parameter. When  estimating the  optimal treatment  rule ('what'  equal to
-### "MOR"), can be set to either a \code{vector} or a list of two vectors.  In
-### the former  case, the vector  gives the true  values of both  the targeted
-### parameter and  standard deviation of  the efficient influence  curve under
-### the optimal treatment rule. In the latter case, the list contains the same
-### vector as  before and a  second vector giving  the values of  the targeted
-### data-adaptive parameters.
+### Defaults  to \code{NULL}.   When estimating  the Average  Treatment Effect
+### ('what' equal to 'ATE'), can be set to a \code{numeric}, the true value of
+### the  targeted  parameter.  When  estimating  the  Mean under  the  Optimal
+### treatment  Rule  ('what'  equal  to  'MOR'),   can  be  set  to  either  a
+### \code{vector} or  a list of two  vectors.  In the former  case, the vector
+### gives  the  true  values  of  both the  targeted  parameter  and  standard
+### deviation of  the efficient  influence curve  under the  optimal treatment
+### rule. In the latter case, the list  contains the same vector as before and
+### a  second  vector   giving  the  values  of   the  targeted  data-adaptive
+### parameters.
  regret=NULL,
 ### Defauls to \code{NULL}. When estimating the optimal treatment rule ('what'
-### equal to "MOR"), can  be set to a vector or a list  of two vectors. In the
+### equal to 'MOR'), can  be set to a vector or a list  of two vectors. In the
 ### former case,  the vectors gives  the true values  of the empirical  or the
 ### counterfactual regrets. In the latter case, the list contains both.
   regret.mirror=FALSE,

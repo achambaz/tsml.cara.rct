@@ -1,28 +1,23 @@
 estimatePsi  <-  function(#Computes the Targeted Minimum Loss Estimator of Psi.
 ### Computes  the targeted  minimum loss  estimator of  Psi and  estimates its
 ### standard deviation.
-                          obs,
-### A \code{data.frame} of observations, as produced by \code{getSample}.
-                          what,
-### A  \code{character}  indicating the  parameter  of  interest to  estimate.
-### Either 'ATE' for  the difference between the means  under '\eqn{A<-1}' and
-### '\eqn{A<-0}'  or 'MOR'  for  the  mean under  the  optimal treatment  rule
-### '\eqn{A<-r(W)}'.
-                          Qtab=NULL,
-### A \code{matrix} of  conditional means of \eqn{Y} given  \eqn{(A,W)} at the
+                          obs,  ### A  \code{data.frame}  of observations,  as
+### produced by \code{getSample}.
+                          what,     ###     A  \code{character} indicating the
+### parameter of  interest to  estimate.  Either  "ATE" for  Average Treatment
+### Effect,  the  difference  between  the  means  under  '\eqn{do(A=1)}'  and
+### '\eqn{do(A=0)}', or  "MOR" for the  Mean under the Optimal  treatment Rule
+### '\eqn{do(A=r(W))}'.
+                          Qtab=NULL, ### A \code{matrix} of  conditional means of \eqn{Y} given  \eqn{(A,W)} at the
 ### observations as they are currently estimated. 
-                          QEpstab,
-### A  \code{matrix} of  estimated conditional  expectations of  \eqn{Y} given
+                          QEpstab, ### A  \code{matrix} of  estimated conditional  expectations of  \eqn{Y} given
 ### \eqn{(A,W)} with columns \code{c("A", "A=0", "A=1")}.
-                          epsHtab,
-### A  \code{matrix} of  clever  covariates with  columns \code{c("A",  "A=0",
+                          epsHtab, ### A  \code{matrix} of  clever  covariates with  columns \code{c("A",  "A=0",
 ### "A=1")}.
-                        ...,
-### Additional parameters.
-                        verbose=FALSE
-### A \code{logical}  or an \code{integer}  indicating the level  of verbosity
+                          ..., ### Additional parameters.
+                          verbose=FALSE ### A \code{logical}  or an \code{integer}  indicating the level  of verbosity
 ### (defaults to 'FALSE').
-                        ) {
+                          ) {
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

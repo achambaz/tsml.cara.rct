@@ -21,10 +21,11 @@ getSample <- structure(
 ### A   \code{function},   the   conditional   variance   of   \eqn{Y}   given
 ### \eqn{(A,W)}. Defaults to \code{Vbar1}.
      what,
-### A \code{character}. If  it is not missing then it must  be equal to either
-### "ATE"  or  "MOR".  In  that  case,  ONLY  estimates of  the  true
-### parameter and  optimal standard  deviation under the  specified simulation
-### scheme (and, possibly, treatment mechanism) are computed and returned.
+### A \code{character}. If it  is not missing then it must  be equal to either
+### 'ATE'  (Average  Treatment  Effect)  or  'MOR'  (Mean  under  the  Optimal
+### treatment Rule).  In  that case, ONLY estimates of the  true parameter and
+### optimal  standard deviation  under the  specified simulation  scheme (and,
+### possibly, treatment mechanism) are computed and returned.
      family=c("beta", "gamma"),
 ### A \code{character}, either "beta" (default)  or "gamma", the nature of the
 ### law of outcome.
@@ -35,10 +36,11 @@ getSample <- structure(
 ### no decomposition). Mainly for internal use.
 ###
      ) {
-      ##references<< Chambaz,  van der  Laan, Scand. J.  Stat., 41(1):104--140
+      ##references<< Chambaz,  van der Laan, Scand.  J.  Stat., 41(1):104--140
       ## (2014).
-      ##details<< By default,  implements the same simulation scheme
-      ## as in Chambaz, van der Laan, Scand.  J. Stat., 41(1):104--140 (2014).
+
+      ##details<<  By default,  implements the  same simulation  scheme as  in
+      ## Chambaz, van der Laan, Scand.  J. Stat., 41(1):104--140 (2014).
       
       ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       ## Validate arguments

@@ -131,7 +131,7 @@ setMethodS3("update", "TSMLCARA", function(#Updates a TSMLCARA Object
 setMethodS3("targetPsi", "TSMLCARA", function(#Targets a TSMLCARA Object Toward the Parameter Psi
 ### Targets a TSMLCARA object toward the parameter Psi.
                                         this,
-### A \code{TSMLECARA} object, as created by \code{TSMLCARA}.
+### A \code{TSMLCARA} object, as created by \code{TSMLCARA}.
                                         ...,
 ### Additional parameters.
                                         verbose=FALSE
@@ -139,7 +139,9 @@ setMethodS3("targetPsi", "TSMLCARA", function(#Targets a TSMLCARA Object Toward 
 ### (defaults to 'FALSE').
                                         ) {
   ##alias<< targetPsi
+
   ##references<<  Chambaz, van der Laan,  Zheng, Chapter 16, Modern Adaptive Randomized Clinical  Trials: Statistical, Operational, and Regulatory  Aspects,  by  A.    Sverdlov  (CRC  Press,  2015).
+
   ##seealso<< tsml.cara.rct, update
   
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -282,9 +284,9 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
 ### design and statistical analysis.
 (what=c("ATE", "MOR"),
 ### A  \code{character}  indicating the  parameter  of  interest to  estimate.
-### Either 'ATE' for  the difference between the means  under '\eqn{A<-1}' and
-### '\eqn{A<-0}'  or 'MOR'  for  the  mean under  the  optimal treatment  rule
-### '\eqn{A<-r(W)}'.
+### Either 'ATE' for the Average  Treatment Effect, the difference between the
+### means under  '\eqn{do(A=1)}' and  '\eqn{do(A=0)}', or  'MOR' for  the Mean
+### under the Optimal treatment Rule '\eqn{do(A=r(W))}'.
   flavor=c("parametric", "lasso"),
 ### A \code{character}  indicating the  'flavor' of the  procedure. 
   ninit=50,
@@ -294,7 +296,7 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
 ### An  \code{integer},  number of  subjects  to  sample  at each  step  after
 ### initialization. Defaults to 25.
   nmax=500,
-### An  \code{integer},  maximal  number  of  subjects to  sample  during  the
+### An  \code{integer},  maximum  number  of  subjects to  sample  during  the
 ### trial. Must be larger than 'ninit+by'. Defaults to 500.
   tm.init=oneOne,
 ### A  \code{function}  describing  the  initial  treatment  mechanism  to  be
@@ -321,7 +323,7 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
 ### A  small positive  \code{numeric}, with  default value  \code{1e-2}.  When
 ### \code{what} equals 'ATE', it is  the minimum value of elements of the
 ### parametric  model \eqn{{\cal  G}}  of treatment  mechanisms (see  argument
-### \code{tm.model}).  The  maximal value is  \code{1-Gmin}.  When \code{what}
+### \code{tm.model}).  The  maximum value is  \code{1-Gmin}.  When \code{what}
 ### equals 'MOR', it  is the minimum value of  the conditional probability
 ### of \eqn{A=r_n(W)} given \eqn{W}.
   Gexpl=1e-2,
@@ -337,7 +339,7 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
 ### \code{1-Gmin}.
   Qmin=1e-2,
 ### A  small positive  \code{numeric}, the  minimum value  of  scaled outcomes
-### \eqn{Y}. The maximal value is \code{1-Qmin}.
+### \eqn{Y}. The maximum value is \code{1-Qmin}.
   conf.level=0.95,
 ###  A  \code{numeric},  the  confidence  level of  the  resulting  confidence
 ###  interval.

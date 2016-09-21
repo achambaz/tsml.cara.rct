@@ -11,9 +11,13 @@ Qbar1 <- function#A Conditional Expectation of \eqn{Y} Given \eqn{(A,W)}
  rho=1
 ### A non-negative \code{numeric}, with default value equal to one.
  ) {
-  ##references<<  Chambaz,  van  der  Laan, Scand.  J.  Stat.,  41(1):104--140
+  ##references<<  Chambaz, van  der  Laan, Scand.   J.  Stat.,  41(1):104--140
   ##(2014).
 
+   ##details<< This conditional expectation of \eqn{Y} given \eqn{(A,W)} where
+   ##\eqn{W=(U,V)} is  \deqn{\rho * V  + 2*U^2 + 2*U  + 1} when  \eqn{A=1} and
+   ##\deqn{\rho/(1+V) + 2*U^2 + 2*U  + 1} when \eqn{A=0}.
+   
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,8 +55,15 @@ Qbar2 <- function#A conditional Expectation of \eqn{Y} Given \eqn{(A,W)}
  rho=1
 ### A non-negative \code{numeric}, with default value equal to 1.5.
  ) {
-  ##references<< Chambaz, Zheng, van der Laan, https://hal.archives-ouvertes.fr/hal-01301297.
+  ##references<<       Chambaz,        Zheng,       van        der       Laan,
+  ##https://hal.archives-ouvertes.fr/hal-01301297.
 
+   ##details<< This conditional expectation of \eqn{Y} given \eqn{(A,W)} where
+   ##\eqn{W=(U,V)} is \deqn{\frac{1}{2} + \frac{3}{8}*\cos(\rho*V*\pi*U)} when
+   ##\eqn{A=1}  and \deqn{\frac{1}{2}  + \frac{1}{4}*\sin(3*\rho/V*\pi*U)} when
+   ##\eqn{A=0}.
+
+   
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -94,6 +105,11 @@ Vbar1 <- function#A Conditional Variance of \eqn{Y} Given \eqn{(A,W)}
   ##references<<  Chambaz,  van der  Laan,  Scand.  J.  Stat.,  41(1):104--140
   ##(2014).
 
+   ##details<< This  conditional variance  of \eqn{Y} given  \eqn{(A,W)} where
+   ##\eqn{W=(U,V)}     is    \deqn{(\rho+U+V)^2}     when    \eqn{A=1}     and
+   ##\deqn{(\frac{1}{\rho+V}+U)^2} when \eqn{A=0}.
+
+   
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -134,6 +150,9 @@ Vbar2 <- function#A Conditional Variance of \eqn{Y} Given \eqn{(A,W)}
  rho=0.1
 ### A non-negative \code{numeric}, with default value equal to one.
  ) {
+
+   ##details<< This  conditional expectation  of \eqn{Y} given  \eqn{(A,W)} is
+   ##always equal to \eqn{\rho}.
 
 
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -383,7 +402,7 @@ getOptTm <- function#Computes the Optimal Treatment Mechanism Within a Parametri
  Gmin=1e-2,
 ### A  small positive  \code{numeric}, the  minimum value  of elements  of the
 ### parametric  model \eqn{{\cal  G}}  of treatment  mechanisms (see  argument
-### \code{tm.model}). The maximal value is \code{1-Gmin}.
+### \code{tm.model}). The maximum value is \code{1-Gmin}.
  piV=c(1/2, 1/3, 1/6),
 ### Marginal distribution of \eqn{V}. Defaults to \code{c(1/2, 1/3, 1/6)}.
  Qbar=Qbar1,
@@ -524,7 +543,7 @@ getOptVar <- function#Computes the Optimal Variance Given a Parametric Model
  Gmin=1e-2,
 ### A  small positive  \code{numeric}, the  minimum value  of elements  of the
 ### parametric  model \eqn{{\cal  G}}  of treatment  mechanisms (see  argument
-### \code{tm.model}). The maximal value is \code{1-Gmin}.
+### \code{tm.model}). The maximum value is \code{1-Gmin}.
  piV=c(1/2, 1/3, 1/6),
 ### Marginal distribution of \eqn{V}. Defaults to \code{c(1/2, 1/3, 1/6)}.
  Qbar=Qbar1,
@@ -632,13 +651,26 @@ ruleQbar <- function#Computes the Treatment Rule Associated with Qbar
 ###Returns a \code{function}, the rule associated with 'Qbar'.
 }
 
-makeLearnQ <- function#Builds a Parametric Model Based on Sample Size
-### Builds a Parametric Model Based on Sample Size
+makeLearnQ <- function#Builds a Parametric Working Model Based on Sample Size
+### Builds a Parametric Working Model Based on Sample Size
 () {
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  ##details<< This functions builds a sample-size-dependent parametric working
+  ##model.   Two fine-tune  parameters  are determined  based  on sample  size
+  ##\eqn{n}:   \eqn{deg=3  +   \lfloor   n/500\rfloor}  and   \eqn{nlev=\lceil
+  ##n/250\rceil}.  If  \eqn{nlev} equals one, then  the model is given  by the
+  ##\code{formula}       \deqn{Y~I(A=0)*V*poly(U)+I(A=1)*V*poly(U)}      where
+  ##\eqn{poly(U)} consists  of \eqn{deg} orthogonal  polynoms of degrees  1 to
+  ##\eqn{deg}. If \eqn{nlev} is larger than or equal to two, then the model is
+  ##given                 by                the                 \code{formula}
+  ##\deqn{Y~I(A=0)*V*(poly(U)+step(U))+I(A=1)*V*(poly(U)+step(U))}       where
+  ##\eqn{poly(U)} consists  of \eqn{deg} orthogonal  polynoms of degrees  1 to
+  ##\eqn{deg} and  \eqn{step(U)} consits of \eqn{nlev}  indicator functions of
+  ##subsets of \eqn{[0,1]} of the form \eqn{\{x:x<\frac{k}{nlev}\}}.
+  
   ## No argument!
   
   if(exists("obs", envir=sys.parent())){
@@ -685,12 +717,27 @@ makeLearnQ <- function#Builds a Parametric Model Based on Sample Size
 }
 
 makeLearnQ.piecewise <- function#Builds a Parametric Model Based on Sample Size
-### Builds a Parametric Model Based on Sample Size
+### Builds a Parametric Working Model Based on Sample Size
 () {
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  ##details<< This functions builds a sample-size-dependent parametric working
+  ##model.   Two fine-tune  parameters  are determined  based  on sample  size
+  ##\eqn{n}:  \eqn{deg=\min(\lceil  n/100\rceil,6)} and  \eqn{nlev=\min(\lceil
+  ##n/100\rceil, 10)}.  If  \eqn{nlev} equals one, then the model  is given by
+  ##the   \code{formula}    \deqn{Y~I(A=0)*V*poly(U)+I(A=1)*V*poly(U)}   where
+  ##\eqn{poly(U)} consists  of \eqn{deg} orthogonal  polynoms of degrees  1 to
+  ##\eqn{deg}. If \eqn{nlev} is larger than or equal to two, then the model is
+  ##given  by   the  \code{formula}   \deqn{Y~I(A=0)*V*(poly(U)+\sum_k  step_k
+  ##(U))+I(A=1)*V*(poly(U)+\sum_k step_k (U))} where \eqn{poly(U)} consists of
+  ##\eqn{deg} orthogonal  polynoms of degrees  1 to \eqn{deg}  and \eqn{step_k
+  ##(U)} consits of \eqn{nlev} ortogonal polynoms of degrees 1 to \eqn{deg} in
+  ##\eqn{U} times the  indicator function of the subset of  \eqn{[0,1]} of the
+  ##form \eqn{\{x:\frac{k}{nlev}\le x <\frac{k}{nlev}\}}.
+
+  
   ## No argument!
   
   if(exists("obs", envir=sys.parent())){

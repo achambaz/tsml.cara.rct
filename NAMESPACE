@@ -31,5 +31,6 @@ export(as.character, as.character.TSMLCARA,
        printHistory,
        Qbar1, Qbar2,
        ruleQbar,
+       setConfLevel, setConfLevel.TSMLCARA,
        tsml.cara.rct,
        Vbar1, Vbar2)

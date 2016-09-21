@@ -1,34 +1,25 @@
 fluctuateQ  <-  function(#Fluctuates  the  Conditional Expectation  of  Y  Given (A,W).
 ### Function  for the  fluctuation of  the conditional  expectation  of \eqn{Y}
 ### given \eqn{(A,W)}, aka 'Q'.
-                         obs,
-### A \code{data.frame} of observations, as produced by \code{getSample}.
-                         Qtab,
-### A \code{matrix} of  conditional means of \eqn{Y} given  \eqn{(A,W)} at the
+                         obs, ### A \code{data.frame} of observations, as produced by \code{getSample}.
+                         Qtab, ### A \code{matrix} of  conditional means of \eqn{Y} given  \eqn{(A,W)} at the
 ### observations as they are currently estimated.
-                         GAstarW,
-### The   \code{vector}   whose   \eqn{i}th   component  is   the   likelihood
+                         GAstarW, ### The   \code{vector}   whose   \eqn{i}th   component  is   the   likelihood
 ### \eqn{Gstar(A_i|W_i)},  where \eqn{Gstar}  is the  current estimate  of the
 ### optimal treatment mechanism within the given parametric model.
-                         what,
-### A  \code{character}  indicating the  parameter  of  interest to  estimate.
-### Either 'ATE' for  the difference between the means  under '\eqn{A<-1}' and
-### '\eqn{A<-0}'  or 'MOR'  for  the  mean under  the  optimal treatment  rule
-### '\eqn{A<-r(W)}'.
-                        weights,
-### The \code{vector} of weights upon which the estimation procedure relies.
-                        Qmin,
-### A \code{numeric},  used to  rescale the values  of the outcome  \eqn{Y} by
+                         what, ### A \code{character} indicating the parameter
+### of interest to  estimate.  Either "ATE" for Average  Treatment Effect, the
+### difference between the means under '\eqn{do(A=1)}' and '\eqn{do(A=0)}', or
+### "MOR" for the Mean under the Optimal treatment Rule '\eqn{do(A=r(W))}'.
+                         weights, ### The \code{vector} of weights upon which the estimation procedure relies.
+                         Qmin, ### A \code{numeric},  used to  rescale the values  of the outcome  \eqn{Y} by
 ### using the scaling \code{function} \code{scaleY}.
-                         targetLink=NULL,
-### An  object of  class 'link-glm'  used to  fluctuate 'Q'.  Defaults to
+                         targetLink=NULL, ### An  object of  class 'link-glm'  used to  fluctuate 'Q'.  Defaults to
 ### 'NULL', in which case the 'logit' link is used.
-                        ...,
-### Additional parameters.
-                        verbose=FALSE
-### A \code{logical}  or an \code{integer}  indicating the level  of verbosity
+                         ..., ### Additional parameters.
+                         verbose=FALSE ### A \code{logical}  or an \code{integer}  indicating the level  of verbosity
 ### (defaults to 'FALSE').
-                        ) {
+                         ) {
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
