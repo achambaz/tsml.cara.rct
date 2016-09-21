@@ -299,9 +299,10 @@ predict.targetTm.glm <- function(object, newdata) {
 
 
 
-targetGstar  <-  function(#Targets the Optimal Treatment Mechanism Within Parametric Model.
+targetGstar  <-  function(#Targets the Optimal Treatment Mechanism When Targeting the Average Treatment Effect (ATE)  Within a Parametric Model 
 ### Function  to  target  the  optimal  treatment  mechanism  within  a  given
-### parametric model, aka 'Gstar'.
+### parametric model  when targeting the  Average Treatment Effect  (ATE), aka
+### 'Gstar'.
                           obs,
 ### A \code{data.frame} of observations, as produced by \code{getSample}.
                           weights,

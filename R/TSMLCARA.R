@@ -42,12 +42,12 @@ setConstructorS3("TSMLCARA", function(#Creates a TSMLCARA Object.
 ### \code{formula(Y~1)} for flavors  'parametric' and 'lasso'.
                                      tm.model=formula(A~1),
 ### A parametric model \eqn{{\cal G}}  of treatment mechanisms, only used when
-### \code{what} equals 'ATE'. The procedure targets the optimal treatment
+### \code{what} equals "ATE". The procedure targets the optimal treatment
 ### mechanism within this model.  Defaults to \code{formula(A~1)}.
                                      tm.control=glm.control(maxit=500), 
 ### A \code{list}  of options to pass  to \code{glm} for the  targeting of the
-### treatment mechanism within the  model defined by argument 'tm.model', only
-### used     when    \code{what}     equals    'ATE'.      Defaults    to
+### treatment mechanism within the model  defined by argument 'tm.model', only
+### used     when      \code{what}     equals     "ATE".       Defaults     to
 ### \code{glm.control(maxit=500)}.
                                      conf.level=0.95,
 ###  A  \code{numeric},  the  confidence  level of  the  resulting  confidence
@@ -886,9 +886,11 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
 ### An object of class \code{TSMLCARA}.
  truth=NULL,
 ### Defaults  to \code{NULL}.   When estimating  the Average  Treatment Effect
-### ('what' equal to 'ATE'), can be set to a \code{numeric}, the true value of
-### the  targeted  parameter.  When  estimating  the  Mean under  the  Optimal
-### treatment  Rule  ('what'  equal  to  'MOR'),   can  be  set  to  either  a
+### ('what' equal to "ATE"), can be set to a \code{vector}, the true values of
+### both  the  targeted parameter  and  standard  deviation of  the  efficient
+### influence  curve under  the optimal  treatment mechanism  given a  working
+### model,  as output  by 'getOptVar'.   When  estimating the  Mean under  the
+### Optimal treatment  Rule ('what' equal  to 'MOR'), can  be set to  either a
 ### \code{vector} or  a list of two  vectors.  In the former  case, the vector
 ### gives  the  true  values  of  both the  targeted  parameter  and  standard
 ### deviation of  the efficient  influence curve  under the  optimal treatment
@@ -901,7 +903,7 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
 ### former case,  the vectors gives  the true values  of the empirical  or the
 ### counterfactual regrets. In the latter case, the list contains both.
   regret.mirror=FALSE,
-### Should the regret(s) be mirrored? If  \code{refret} is given, should it be
+### Should the regret(s) be mirrored? If  \code{regret} is given, should it be
 ### multiplied by (-1)? (defaults to \code{FALSE}).
   lower.bound=TRUE,
 ### Defaults to \code{TRUE}. Should the  confidence lower bound on the regrets
@@ -930,6 +932,9 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
 
   ## Retrieving 'what'
   what <- getWhat(this)
+  what.expand <- switch(what,
+                        ATE="Average Treatment Effect (ATE)",
+                        MOR="Mean of the Optimal treatment Rule (MOR)")
 
   ## Argument 'regret'
   if (what!="MOR" && !is.null(regret)) {
@@ -937,10 +942,8 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
   }
 
   ## Argument 'regret.mirror'
-  if (what!="MOR" && !is.null(regret.mirror)) {
-    throw("Regrets are only handled when 'what' equals 'MOR', not: ", what)
-    regret.mirror <- Arguments$getLogical(regret.mirror)
-  }
+  regret.mirror <- Arguments$getLogical(regret.mirror)
+  
   
   ## Argument 'lower.bound'
   lower.bound <- Arguments$getLogical(lower.bound)
@@ -970,10 +973,15 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
     pch <- 20
     if (!is.null(truth)) {
       if (!is.list(truth)) {
-        uopt <- truth["psi"]+qnorm(alpha/2)*truth["psi.sd.opt"]/sqrt(hn)
-        lopt <- truth["psi"]-qnorm(alpha/2)*truth["psi.sd.opt"]/sqrt(hn)
         usd <- truth["psi"]+qnorm(alpha/2)*truth["psi.sd"]/sqrt(hn)
-        lsd <- truth["psi"]-qnorm(alpha/2)*truth["psi.sd"]/sqrt(hn)        
+        lsd <- truth["psi"]-qnorm(alpha/2)*truth["psi.sd"]/sqrt(hn)
+        if (what=="MOR") {
+          uopt <- truth["psi"]+qnorm(alpha/2)*truth["psi.sd.opt"]/sqrt(hn)
+          lopt <- truth["psi"]-qnorm(alpha/2)*truth["psi.sd.opt"]/sqrt(hn)
+        } else {
+          uopt <- usd
+          lopt <- lsd
+        }
         ylim <- range(ics+rep(1,2) %*% t(hp),
                       truth["psi"],
                       uopt, lopt, usd, lsd)
@@ -1004,7 +1012,8 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
          ylab=expression(paste(psi[n], "*")), log=ifelse(xlog, "x", ""))
     ## title(main=paste("Representing the '", deparse(substitute(this)), "' TSMLCARA object\n(option '", getWhat(this), "')", sep="")) 
     mtext(paste(sprintf("[%s-confidence interval]", 1-alpha)), 2, line=2)
-    mtext("Mean rewards", 3, line=1, font=2)
+    mtext(what.expand, 3, line=2, font=2)
+    mtext("Targeted estimators", 3, line=1, font=4)
     dummy <- sapply(seq(along=hn), function(x) {lines(c(hn[x],hn[x]), hp[x]+ics[, x])})
     if (!is.null(truth)) {
       if (!is.list(truth)) {
@@ -1031,6 +1040,7 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
               xlab="Sample size at updating steps",
               ylab="", type="b", pch=pch, log=ifelse(xlog, "x", ""))
       legend("left", legend=nms, text.col=1:4)
+      mtext("Targeted treatment mechanisms", 3, line=1, font=4)
     } else if (what=="MOR" & !is.null(truth)) {
       ##
       ## second plot

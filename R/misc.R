@@ -405,6 +405,9 @@ getOptTm <- function#Computes the Optimal Treatment Mechanism Within a Parametri
 ### \code{tm.model}). The maximum value is \code{1-Gmin}.
  piV=c(1/2, 1/3, 1/6),
 ### Marginal distribution of \eqn{V}. Defaults to \code{c(1/2, 1/3, 1/6)}.
+  family=c("beta", "gamma"),
+### A \code{character}, either "beta" (default)  or "gamma", the nature of the
+### law of outcome.
  Qbar=Qbar1,
 ### A   \code{function},  the   conditional  expectation   of   \eqn{Y}  given
 ### \eqn{(A,W)}. Defaults to \code{Qbar1}.
@@ -437,9 +440,15 @@ getOptTm <- function#Computes the Optimal Treatment Mechanism Within a Parametri
   ## Argument 'Gmin'
   Gmin <- Arguments$getNumeric(Gmin, c(0, 1/2))
 
-  ## TRICK
-  ## Gmin <- Gmin/2
-  
+  ## Argument 'piV'
+  piV <- Arguments$getNumerics(piV, range=c(0,1))
+  if (sum(piV)!=1) {
+    throw("Argument 'piV' should consist of non-negative weights summing to one.") 
+  }
+
+  ## Argument 'family':
+  family <- match.arg(family)
+   
   ## Argument 'Qbar':
   mode <- mode(Qbar);
   if (mode != "function") {
@@ -514,7 +523,8 @@ getOptTm <- function#Computes the Optimal Treatment Mechanism Within a Parametri
   ## Computing Gstar
   ##
 
-  obs <- getSample(n, tm=oneOne, piV=piV, Qbar=Qbar, Vbar=Vbar)
+   obs <- getSample(n, tm=oneOne, piV=piV, Qbar=Qbar, Vbar=Vbar, family=family)
+   ## ## not  'what="ATE"' because otherwise no data is output!
   AW <- extractAW(obs)
   
   ## targeting 'Gstar'
@@ -532,9 +542,10 @@ getOptTm <- function#Computes the Optimal Treatment Mechanism Within a Parametri
 ### \eqn{{\cal G}}. 
 }
 
-getOptVar <- function#Computes the Optimal Variance Given a Parametric Model
-### Computes the optimal variance, defined as the variance associated with the
-### optimal treatment  mechanism within a given parametric  model of treatment
+getOptVar <- function#Computes the Optimal Variance Given a Parametric Model When Targeting the Average Treatment Effect
+### Computes the optimal variance when  targeting the Average Treatment Effect
+### (ATE). The optimal variance is defined as the variance associated with the
+### optimal treatment mechanism  within a given parametric  model of treatment
 ### mechanisms. The computation is based on Monte Carlo simulation.
 (tm.model=formula(A~1),
 ### A parametric  model \eqn{{\cal G}} of treatment  mechanisms. The procedure
@@ -546,6 +557,9 @@ getOptVar <- function#Computes the Optimal Variance Given a Parametric Model
 ### \code{tm.model}). The maximum value is \code{1-Gmin}.
  piV=c(1/2, 1/3, 1/6),
 ### Marginal distribution of \eqn{V}. Defaults to \code{c(1/2, 1/3, 1/6)}.
+  family=c("beta", "gamma"),
+### A \code{character}, either "beta" (default)  or "gamma", the nature of the
+### law of outcome.
  Qbar=Qbar1,
 ### A   \code{function},  the   conditional  expectation   of   \eqn{Y}  given
 ### \eqn{(A,W)}. Defaults to \code{Qbar1}.
@@ -576,7 +590,16 @@ getOptVar <- function#Computes the Optimal Variance Given a Parametric Model
           deparse(substitute(form, list(form=tm.model)))) 
   }
 
-  
+  ## Argument 'piV'
+  piV <- Arguments$getNumerics(piV, range=c(0,1))
+  if (sum(piV)!=1) {
+    throw("Argument 'piV' should consist of non-negative weights summing to one.") 
+  }
+
+  ## Argument 'family':
+  family <- match.arg(family)
+
+   
   ## Argument 'Qbar':
   mode <- mode(Qbar);
   if (mode != "function") {
@@ -607,16 +630,16 @@ getOptVar <- function#Computes the Optimal Variance Given a Parametric Model
   ##
 
   optTm <- getOptTm(tm.model=tm.model,   Gmin=Gmin,
-                    piV=piV,  Qbar=Qbar, Vbar=Vbar,
+                    piV=piV,  family=family, Qbar=Qbar, Vbar=Vbar,
                     n=n, verbose=verbose)
   optVar <- getSample(n=n, tm=optTm,
-                      piV=piV,  Qbar=Qbar, Vbar=Vbar,
+                      piV=piV,  family=family, Qbar=Qbar, Vbar=Vbar,
                       what="ATE")[2]^2
   names(optVar) <- NULL
   
   return(optVar)
 ### Returns  the  optimal  variance   associated  with  the  parametric  model
-### \eqn{{\cal G}}.
+### \eqn{{\cal G}} when targeting the Average Treatment Effect (ATE).
 }
 
 
@@ -725,7 +748,7 @@ makeLearnQ.piecewise <- function#Builds a Parametric Model Based on Sample Size
 
   ##details<< This functions builds a sample-size-dependent parametric working
   ##model.   Two fine-tune  parameters  are determined  based  on sample  size
-  ##\eqn{n}:  \eqn{deg=\min(\lceil  n/100\rceil,6)} and  \eqn{nlev=\min(\lceil
+  ##\eqn{n}: \eqn{deg=\min(\lceil  n/100\rceil, 6)}  and \eqn{nlev=\min(\lceil
   ##n/100\rceil, 10)}.  If  \eqn{nlev} equals one, then the model  is given by
   ##the   \code{formula}    \deqn{Y~I(A=0)*V*poly(U)+I(A=1)*V*poly(U)}   where
   ##\eqn{poly(U)} consists  of \eqn{deg} orthogonal  polynoms of degrees  1 to
