@@ -616,9 +616,9 @@ setMethodS3("as.character", "TSMLCARA", function(#Returns a Description of a TSM
   s <- c(s, "")
   ## what
   if (getWhat(this)=="ATE") {
-    what <- "risk difference"
+    what <- "Average Treatment Effect (ATE)"
   } else if (getWhat(this)=="MOR") {
-    what <- "optimal treatment rule"
+    what <- "Mean of the Optimal treatment Rule (MOR)"
   }
   s <- c(s, "Parameter of interest: ", what)
   s <- c(s, "")

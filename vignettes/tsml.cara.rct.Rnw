@@ -1,0 +1,337 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{tsml.cara.rct}
+%\VignetteDepends{tsml.cara.rct}
+%\VignetteKeywords{targeted  sequential  design for  targeted  data-adaptive inference of the optimal treatment rule and its mean reward}
+%\VignettePackage{tsml.cara.rct}
+
+\documentclass{article}
+\usepackage{amsmath,amssymb,manfnt}
+\graphicspath{{fig/}}
+
+<<setup, include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+fig.path='fig/'
+)
+@
+
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+
+\addtolength{\parskip}{\baselineskip}
+
+
+\DeclareMathOperator{\Var}{Var}
+\newcommand{\bQ}{\bar{Q}}
+\newcommand{\gb}{g^{\rm b}}
+\newcommand{\bfg}{{\bf g}}
+\newcommand{\xR}{\mathbb{R}}
+\newcommand{\xW}{{\cal W}}
+
+\title{Using the \Githubpkg{achambaz/tsml.cara.rct} package}
+
+\author{Antoine Chambaz\\\email{achambaz@u-paris10.fr}}
+
+\date{Package version \Sexpr{packageDescription("tsml.cara.rct")$Version}\\Date \Sexpr{packageDescription("tsml.cara.rct")$Date}}
+
+
+\begin{document}
+
+\maketitle 
+\tableofcontents 
+
+% The caution symbol \textdbend marks important details.
+
+
+
+\section{Citing \Rpackage{tsml.cara.rct}}
+
+If  you  use  the   \Githubpkg{achambaz/tsml.cara.rct}  package,  please  cite
+\cite{chambaz15,zheng16} and/or \cite{chambaz16}.
+
+\section{Using  the \Rpackage{tsml.cara.rct} \texttt{R} package} 
+
+The \Githubpkg{achambaz/tsml.cara.rct} package is meant to simulate easily the
+sampling from  a targeted sequential  design and the  targeted (data-adaptive)
+inference  of the  Average  Treatment  Effect (ATE)  or  Mean  of the  Optimal
+treatment   Rule   (MOR)    based   on   accrued   data    as   described   in
+\cite{chambaz15,zheng16,chambaz16}.  We assume that  the user is familiar with
+the procedures.
+
+The $n$th observation is $O_{n}  \equiv (W_{n},A_{n},Y_{n})$ where $W_{n}$ are
+the  $n$th baseline  covariates, $A_{n}  \in  \{0,1\}$ is  the $n$th  assigned
+treatment  and  $Y_{n}$  is  the $n$th  outcome/reward.   The  data-generating
+distribution  of  $O_{1},   \ldots,  O_{n}$  is  identified   by  $Q_{0}$  and
+$\bfg_{n} \equiv  (g_{1}, \ldots, g_{n})$.   The former identifies  the common
+marginal  distribution  of the  independent  $W_{1},  \ldots, W_{n}$  and  the
+conditional distribution of  each $Y_{i}$ given $(A_{i},  W_{i})$.  The latter
+identifies the conditional distributions of all $A_{i}$ given $W_{i}$, $A_{i}$
+being drawn  from the Bernoulli distribution  with parameter $g_{i}(1|W_{i})$,
+where    the    data-adaptive    definition     of    $g_{i}$    depends    on
+$O_{1}, \ldots, O_{i-1}$.
+
+The function \Rfunction{getSample} simulates independent observations from the
+distribution $P_{Q_{0}, g}$ such that $O  \equiv (W,A,Y) \sim P_{Q_{0}, g}$ is
+sequentially drawn as follows:
+\begin{itemize}
+\item  $W$  equals  $(U,V)$  with  $U$  and  $V$  independent,  $U$  uniformly
+  distributed over $[0,1]$ and $V \in  \{1, \ldots, \nu\}$ with a distribution
+  characterized  by argument  \Robject{piV}, a  vector of  length $\nu$  whose
+  $v$th component equals the probability of $V=v$;
+\item $A$ is  drawn conditionally on $W$ from the  Bernoulli distribution with
+  parameter  $g(1|W)$, characterized  by  argument  \Robject{tm}, a  treatment
+  mechanism;
+\item $Y$  is drawn  conditionally on  $(A,W)$ from either  the Gamma  or Beta
+  distribution, depending on argument  \Robject{family}, with conditional mean
+  and variance characterized by arguments \Robject{Qbar} and \Robject{Vbar}.
+\end{itemize}
+
+If argument \Robject{what} is not missing and equals either \Robject{"ATE"} or
+\Robject{"MOR"},  then \Rfunction{getSample}  also allows  the computation  of
+(Monte Carlo approximations  to) the true values of the  parameter of interest
+and standard deviation  of the efficient influence curve  of the corresponding
+mapping  evaluated   at  $P_{Q_{0},   g}$.   If   \Robject{what}  is   set  to
+\Robject{"MOR"}, then (a Monte Carlo  approximation to) the standard deviation
+of the  efficient influence  curve of the  corresponding mapping  evaluated at
+$P_{Q_{0},  r_{0}}$ is  also computed,  where $r_{0}  \equiv r(Q_{0})$  is the
+optimal treatment rule under $Q_{0}$.
+
+\subsection{Set up}
+
+First, we set the verbosity parameter and random seed.
+
+<<message=FALSE>>=
+library("R.utils")
+library("tsml.cara.rct")
+log <- Arguments$getVerbose(-8, timestamp=TRUE)
+set.seed(12345)
+@
+
+\subsection{Average Treatment Effect}
+
+Here,  we  choose  \Robject{piV=c(1/2, 1/3,  1/6)},  \Robject{family="gamma"},
+\Robject{Qbar=Qbar1}, 
+\begin{equation*}
+  \bQ_{Y,0} (A,W) \equiv E_{Q_{0}} (Y|A,W) =  A V + \frac{1-A}{1+V} + 2U^{2} +
+  2U +1, 
+\end{equation*}
+\Robject{Vbar=Vbar1}, 
+\begin{equation*}
+  \Var_{Q_{0}} (Y|A,W) = A (1+U+V)^{2} + (1-A)\left(\frac{1}{1+V}+U\right)^{2}, 
+\end{equation*}
+target the ATE
+\begin{equation*}
+  \psi_{0}  \equiv E_{Q_{0}}  \left(E_{Q_{0}} (Y|A=1,  W) -  E_{Q_{0}} (Y|A=0,
+    W)\right) = \frac{91}{72},
+\end{equation*}
+and aim  at minimizing the  asymptotic variance  of our targeted  minimum loss
+estimator (TMLE)  $\psi_{n}^{*}$.  The  minimization is relative  to $g$  in a
+working model chosen by us.
+
+When the  minimization is relative  to $g$ in  the working model  described by
+\Rcode{tm.model=formula(A~1)}, which  assigns treatment regarless of  $W$, the
+smallest asymptotic standard  deviation that our estimator can  achieve can be
+computed     approximately    as     follows    (based     on    \Rcode{n=1e5}
+i.i.d. observations):
+<<<>>=
+psi.sd <- sqrt(getOptVar(n=1e5,
+                        tm.model=formula(A~1),
+                        piV=c(1/2, 1/3, 1/6),
+                        family="gamma",
+                        Qbar=Qbar1,
+                        Vbar=Vbar1))
+truth <- c(psi=91/72, psi.sd=psi.sd)
+truth
+@ 
+
+\subsubsection{Simulation using \Rfunction{tsml.cara.rct}}
+
+Let us  consider the case that  we rely on  the (fixed) working model  for $g$
+described  by  \Rcode{tm.model}  and  (fixed) working  model  for  $\bQ_{Y,0}$
+described by \Rcode{learnQ} as defined below:
+
+<<>>=
+## parametric example
+tm.model <- formula(A~.)
+learnQ <- formula(Y~I(as.integer(A)):(U+V)+I(as.integer(1-A)):(U+V))
+@ 
+
+The  \Rcode{ninit=200}   first  observations  are  drawn   independently  from
+$P_{Q_{0}, \gb}$,  where $\gb$ is  the balanced treatment  mechanism, function
+\Rfunction{oneOne}. Then, the design is updated  every time the sample size is
+a  multiple of  \Rcode{by=100}, using  \Rcode{tm.ref=oneOne} as  the reference
+treatment mechanism.
+
+<<warning=FALSE>>=
+ATE.param <- tsml.cara.rct(what="ATE",
+                           flavor="parametric",
+                           ninit=200,
+                           by=100,
+                           nmax=500,
+                           tm.init=oneOne,
+                           tm.ref=oneOne,
+                           learnQ=learnQ,
+                           tm.model=tm.model,
+                           conf.level=0.95,
+                           piV=c(1/2, 1/3, 1/6),
+                           family="gamma",
+                           Qbar=Qbar1,
+                           Vbar=Vbar1)
+ATE.param
+@ 
+
+A  visual  representation  of  the  course   of  the  procedure  is  shown  in
+Figure~\ref{fig/fig:ATE:param-1}. It is obtained by running
+
+<<fig:ATE:param, fig.show='hide', fig.width=6, fig.height=6>>=
+plot(ATE.param, truth=truth)
+@
+
+\incfig{fig/fig:ATE:param-1}{0.5\textwidth}{The   course  of   the  procedure
+  summarized by \Robject{ATE.param}.}{}
+
+We may prefer to estimate $\bQ_{Y,0}$  by fitting a larger working model using
+the LASSO.  Redefine \Robject{learnQ} by setting
+
+<<>>= 
+coeffs <- attr(poly(seq(0, 1, 1e-3), 3), "coefs")
+learnQ <- formula(Y~I(as.integer(A)):(poly(U, 3, coefs=coeffs)*V)+
+                    I(as.integer(1-A)):(poly(U, 3, coefs=coeffs)*V))
+@ 
+
+and running
+
+<<warning=FALSE>>=
+## lasso example
+ATE.lasso <- tsml.cara.rct(what="ATE",
+                           flavor="lasso",
+                           ninit=200,
+                           by=100,
+                           nmax=500,
+                           learnQ=learnQ,
+                           tm.init=oneOne,
+                           tm.ref=oneOne,
+                           tm.model=tm.model,
+                           conf.level=0.95,
+                           piV=c(1/2, 1/3, 1/6),
+                           family="gamma",
+                           Qbar=Qbar1,
+                           Vbar=Vbar1)
+ATE.lasso
+@ 
+
+A visual  representation of the  course of this  second procedure is  shown in
+Figure~\ref{fig/fig:ATE:lasso-1}. It is obtained by running
+
+<<fig:ATE:lasso, fig.show='hide', fig.width=6, fig.height=6>>=
+plot(ATE.lasso, truth=truth)
+@
+
+\incfig{fig/fig:ATE:lasso-1}{0.5\textwidth}{The   course  of   the  procedure
+  summarized by \Robject{ATE.lasso}.}{}
+
+\subsubsection{Step by step simulation}
+
+It is also  possible to carry out  the procedure step by  step.  Introduce the
+working  model for  $g$ described  by \Rcode{tm.model}  and working  model for
+$\bQ_{Y,0}$ described by \Rcode{learnQ} as redefined below:
+
+<<>>=
+tm.model <- formula(A~V)
+learnQ <- formula(Y~A*V)
+@ 
+
+The  smallest asymptotic standard  deviation that our estimator  can achieve
+for this new working model can  be computed approximately as follows (based on
+\Rcode{n=1e5} i.i.d. observations):
+
+<<<>>=
+psi.sd <- sqrt(getOptVar(n=1e5,
+                         tm.model=tm.model,
+                         piV=c(1/2, 1/3, 1/6),
+                         family="gamma",
+                         Qbar=Qbar1,
+                         Vbar=Vbar1))
+truth <- c(psi=91/72, psi.sd=psi.sd)
+truth
+@ 
+
+
+% <<warning=FALSE, eval=FALSE>>=
+% ## manually, another parametric example
+% obs <- getSample(200, 
+%                  piV=c(1/2, 1/3, 1/6),
+%                  family="gamma",
+%                  Qbar=Qbar1,
+%                  Vbar=Vbar1)
+% nobs <- nrow(obs)
+% ATE.param2 <- tsml.cara.rct:::TSMLCARA(what="ATE",
+%                                        obs=obs,
+%                                        learnQ=learnQ,
+%                                        tm.model=tm.model,
+%                                        Gmin=1e-2,
+%                                        flavor="parametric",
+%                                        verbose=log)
+% while (nobs<=500) {
+%   tsml.cara.rct:::update.TSMLCARA(ATE.param2, verbose=log)
+%   tsml.cara.rct:::targetPsi.TSMLCARA(ATE.param2, verbose=log)
+%   gstar <- tsml.cara.rct:::getGstar.TSMLCARA(ATE.param2)
+%   newObs <- getSample(100, tm=gstar,
+%                       piV=c(1/2, 1/3, 1/6),
+%                       family="gamma",
+%                       Qbar=Qbar1,
+%                       Vbar=Vbar1)
+%   tsml.cara.rct:::addNewSample.TSMLCARA(ATE.param2, newObs)
+%   nobs <- nrow(getObs(ATE.param2))
+% }
+% tsml.cara.rct:::update.TSMLCARA(ATE.param2, verbose=log)
+% tsml.cara.rct:::targetPsi.TSMLCARA(ATE.param2, verbose=log)
+% ATE.param2
+% x11()
+% plot(ATE.param2, truth=truth)
+% @ 
+
+
+\section{Session information}
+\label{sec:session-information}
+
+Here is  the output  of \Rfunction{sessionInfo}  on the  system on  which this
+document was compiled. 
+
+<<echo=FALSE>>=
+sessionInfo()
+@ 
+
+
+\begin{thebibliography}{}
+\bibitem[Chambaz et~al., 2015]{chambaz15} 
+  Chambaz,  A., van~der Laan, M.~J.,  and    Zheng,   W.    (2015).     
+  \newblock   Targeted    covariate-adjusted   response-adaptive   LASSO-based
+  randomized controlled trials
+  \newblock book chapter  in {\em Modern Adaptive  Randomized Clinical Trials:
+    Statistical, Operational, and Regulatory Aspects} by A. Sverdlov
+  \newblock CRC Press.
+
+\bibitem[Zheng et~al., 2016]{zheng16} 
+  Zheng, W., Chambaz, A., and van~der Laan, M.~J. (2016).  
+  \newblock   Drawing  valid   targeted   inference  when   covariate-adjusted
+  response-adaptive  RCT meets  data-adaptive loss-based  estimation, with  an
+  application to the LASSO 
+  \newblock {\em Submitted}.  https://hal.archives-ouvertes.fr/hal-01180719
+  
+\bibitem[Chambaz et~al., 2016]{chambaz16}
+  Chambaz, A., Zheng, W., and van~der Laan, M.~J. (2016).
+  \newblock Targeted  sequential design for targeted  data-adaptive inference of
+  the optimal treatment rule and its mean reward 
+  \newblock {\em Submitted}.
+\end{thebibliography}
+
+
+
+\end{document}
+
+
+
+
