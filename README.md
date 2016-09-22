@@ -16,10 +16,14 @@ The `tsml.cara.rct()` function of the [tsml.cara.rct] package...
 [tsml.cara.rct]: https://github.com/achambaz/tsml.cara.rct
 
 
-## Installation
-R package profmem is only available via [GitHub](https://github.com/achambaz/tsml.cara.rct) and can be installed in R as:
-```r
-source('http://callr.org/install#achambaz/tsml.cara.rct')
+## Installation 
+
+R   package   [tsml.cara.rct]    is   only   available   via
+[GitHub](https://github.com/achambaz/tsml.cara.rct) and can  be installed in R
+as: 
+
+```r 
+source('http://callr.org/install#achambaz/tsml.cara.rct') 
 ```
 
 
