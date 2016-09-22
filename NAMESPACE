@@ -1,5 +1,16 @@
 import(R.utils)
 
+importFrom("graphics", "abline", "legend", "lines", "matplot", "mtext", "par", "points") 
+importFrom("grDevices", "dev.off", "pdf")
+importFrom("stats", ".checkMFClasses", ".getXlevels", "as.formula",
+           "binomial", "coef", "delete.response", "family", "formula",
+           "glm", "glm.control", "is.empty.model", "model.extract",
+           "model.frame", "model.matrix", "model.offset",
+           "model.response", "model.weights", "optim", "predict",
+           "qnorm", "rbeta", "rbinom", "rgamma", "runif", "terms",
+           "update")
+importFrom("utils", "str")
+
 importFrom(R.methodsS3, setMethodS3, throw)
 importFrom(R.oo, setConstructorS3, extend, Object, getHistory)
 importFrom(graphics, plot)
