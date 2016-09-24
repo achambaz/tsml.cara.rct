@@ -10,7 +10,9 @@ Qbar1 <- function#A Conditional Expectation of \eqn{Y} Given \eqn{(A,W)}
 ### of \eqn{W} and the value of \eqn{A}.
  rho=1
 ### A non-negative \code{numeric}, with default value equal to one.
- ) {
+) {
+  ##seealso<< Qbar2
+  
   ##references<<  Chambaz, van  der  Laan, Scand.   J.  Stat.,  41(1):104--140
   ##(2014).
 
@@ -46,6 +48,76 @@ Qbar1 <- function#A Conditional Expectation of \eqn{Y} Given \eqn{(A,W)}
 ### Returns a \code{vector} of conditional expectations given \eqn{(A,W)}.
 }
 
+Qbar3 <- function#A conditional Expectation of \eqn{Y} Given \eqn{(A,W)}
+### A  conditional  expectation  of  \eqn{Y}   given  \eqn{(A,W)}  to  use  in
+### \code{\link{getSample}}.
+(AW,
+### A \code{data.frame} of observations,  whose columns contain the components
+### of \eqn{W} and the value of \eqn{A}.
+ rho=1,
+### A non-negative \code{numeric}, with default value equal to 1.
+  tau=0.1
+### A non-negative \code{numeric}, with default value equal to 0.1.
+
+) {
+  ##seealso<< Qbar1, Qbar2
+
+  ##references<<       Chambaz,        Zheng,       van        der       Laan,
+  ##https://hal.archives-ouvertes.fr/hal-01301297.
+
+   ##details<< This conditional expectation of \eqn{Y} given \eqn{(A,W)} where
+   ##\eqn{W=(U,V)} is \deqn{\frac{1}{2} + \frac{3}{8}*\cos(\rho*V*\pi*U)} when
+   ##\eqn{A=1} and \deqn{\frac{1}{2}  + \frac{1}{4}*\sin(3*\rho/V*\pi*U)} when
+   ##\eqn{A=0} PROVIDED THAT  the absolute value of the  corresponding blip is
+   ##larger than 'tau'. If the blip is between 0 and tau, then the conditional
+   ##expectation  of \eqn{Y}  given \eqn{(A=0,W)}  is set  to the  conditional
+   ##expectation of  \eqn{Y} given  \eqn{(A=1,W)} minus tau.   If the  blip is
+   ##between -tau  and 0,  then the conditional  expectation of  \eqn{Y} given
+   ##\eqn{(A=1,W)}  is set  to the  conditional expectation  of \eqn{Y}  given
+   ##\eqn{(A=0,W)} minus tau. This is a somewhat brutal way to ensure that the
+   ##margin assumption is met.
+
+   
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## Validate arguments
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  ## Argument 'AW':
+  ## AW <- Arguments$getNumerics(AW)
+  if (!is.data.frame(AW)) {
+    throw("Argument 'AW' should be a data.frame, not:", mode(AW))
+  }
+
+  ## Argument 'rho':
+  rho <- Arguments$getNumeric(rho, c(0, Inf))
+
+  ## Argument 'tau':
+  tau <- Arguments$getNumeric(tau, c(0, 1/2))
+
+   
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## Core
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  U <- AW[, "U"]
+  V <- as.integer(AW[, "V"])
+  A <- AW[, "A"]
+  out1 <- (1+0.75*cos(rho*V*pi*U))/2
+  out0 <- (1+0.50*sin(3*rho/V*pi*U))/2
+
+  blip <- out1 - out0
+  close.top <- which(0<=blip&blip<=tau)
+  close.bottom <- which(-tau<=blip&blip<0)
+  out0[close.top] <- out1[close.top]-tau
+  out1[close.bottom] <- out0[close.bottom]-tau
+   
+  out <- A*out1 + (1-A)*out0
+  
+  return(out)
+### Returns a \code{vector} of conditional expectations given \eqn{(A,W)}.
+}
+
+
+
 Qbar2 <- function#A conditional Expectation of \eqn{Y} Given \eqn{(A,W)}
 ### A  conditional  expectation  of  \eqn{Y}   given  \eqn{(A,W)}  to  use  in
 ### \code{\link{getSample}}.
@@ -54,7 +126,9 @@ Qbar2 <- function#A conditional Expectation of \eqn{Y} Given \eqn{(A,W)}
 ### of \eqn{W} and the value of \eqn{A}.
  rho=1
 ### A non-negative \code{numeric}, with default value equal to 1.5.
- ) {
+) {
+   ##seealso<< Qbar1
+
   ##references<<       Chambaz,        Zheng,       van        der       Laan,
   ##https://hal.archives-ouvertes.fr/hal-01301297.
 
@@ -90,6 +164,7 @@ Qbar2 <- function#A conditional Expectation of \eqn{Y} Given \eqn{(A,W)}
   return(out)
 ### Returns a \code{vector} of conditional expectations given \eqn{(A,W)}.
 }
+
 
 
 
@@ -355,35 +430,6 @@ scaleQmat <- function#Scaling Function of a Matrix.
 }
 
 
-## checkCont <- function#Checks Continuity
-## ### Checks whether a covariate is continuous or not.
-## (W
-## ### A \code{numeric} vector of covariates.
-##  ) {
-##   ## details<<  Somewhat approximate  method to check  whether a  covariate is
-##   ##  continuous   or  not  based   on  independent  copies  drawn   from  its
-##   ##  distribution.   The  covariate  is  declared continuous  iff  there  are
-##   ## \code{n} different values among the \code{n} copies.
-
-##   ## - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - -
-##   ## Validate arguments
-##   ## - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - -
-  
-##   ## Argument 'W'
-##   W <- Arguments$getNumerics(W)
-
-##   ## - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - -
-##   ## Core
-##   ## - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - -
-##   out <- TRUE
-##   test <- all(diff(sort(W, method="quick"))>0)
-##   if (!test) {
-##     out <- FALSE
-##   }
-##   return(out)
-## ### Returns  a  \code{logical}, 'TRUE'  if  the  covariate  is continuous  and
-## ### 'FALSE' otherwise.
-## }
 
 
 blik <- function(x, y)
@@ -812,7 +858,53 @@ makeLearnQ.piecewise <- function#Builds a Parametric Model Based on Sample Size
 ###Returns a \code{formula} describing the parametric model.
 }
 
+smoothIndicator <- function#Smooth Approximation of \eqn{1\{x>0\}} Over \eqn{[-1,+1]}
+### Smooth approximation of \eqn{1\{x>0\}} over  \eqn{[-1,+1]}, used to map an
+### estimated blip function to a stochastic treatment mechanism.
+(xx,
+### A \code{vector} of \code{numerics} between -1 and +1.
+  exploit,
+### A small positive  \code{numeric}.
+  explore
+### A small positive  \code{numeric}.
+) {
+  ##references<<       Chambaz,        Zheng,       van        der       Laan,
+  ##https://hal.archives-ouvertes.fr/hal-01301297.
+ 
+  ##details<< This  function is  a non-decreasing, Lipschitz  approximation of
+  ##\eqn{1\{x>0\}} over \eqn{[-1,+1]}.  It takes  its values in \eqn{[t, 1-t]}
+  ##where \eqn{t}  equals \code{exploit},  equals \eqn{t}  if its  argument is
+  ##smaller  than \eqn{-\xi}  and \eqn{1-t}  if  its argument  is larger  than
+  ##\eqn{\xi}, and 0.5 if its argument equals 0.
 
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## Validate arguments
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ 
+  ## Argument 'xx':
+  xx <- Arguments$getNumerics(xx, c(-1, 1))
+
+  ## Argument 'exploit':
+  exploit <- Arguments$getNumeric(exploit, c(0, 1/2))
+
+  ## Argument 'explore':
+  explore <- Arguments$getNumeric(explore, c(0, 1/2))
+
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## Core
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  aa <- -(1/2 - exploit)/(2*explore^3)
+  bb <- (1/2 - exploit)/(2*explore/3)
+  cc <- 1/2
+  
+  out <- rep(exploit, length(xx))
+  pos <- (xx > explore)
+  btwn <- (-explore <= xx & xx <= explore)
+  out[pos] <- 1-exploit
+  out[btwn] <- aa*xx[btwn]^3 + bb*xx[btwn] + cc
+
+  return(out)
+}
 
 ############################################################################
 ## HISTORY:

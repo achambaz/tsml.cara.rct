@@ -15,7 +15,7 @@ fig.path='fig/'
 )
 @
 
-<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+<<style:knitr, eval=TRUE, echo=FALSE, results="asis">>=
 BiocStyle::latex()
 @
 
@@ -23,12 +23,12 @@ BiocStyle::latex()
 \addtolength{\parskip}{\baselineskip}
 
 
+\newcommand{\1}{{\bf 1}}
 \DeclareMathOperator{\Var}{Var}
 \newcommand{\bQ}{\bar{Q}}
 \newcommand{\gb}{g^{\rm b}}
 \newcommand{\bfg}{{\bf g}}
-\newcommand{\xR}{\mathbb{R}}
-\newcommand{\xW}{{\cal W}}
+
 
 \title{Using the \Githubpkg{achambaz/tsml.cara.rct} package}
 
@@ -102,11 +102,11 @@ optimal treatment rule under $Q_{0}$.
 
 First, we set the verbosity parameter and random seed.
 
-<<message=FALSE>>=
+<<seed, message=FALSE>>=
 library("R.utils")
 library("tsml.cara.rct")
 log <- Arguments$getVerbose(-8, timestamp=TRUE)
-set.seed(12345)
+set.seed(54321)
 @
 
 \subsection{Average Treatment Effect}
@@ -123,8 +123,8 @@ Here,  we  choose  \Robject{piV=c(1/2, 1/3,  1/6)},  \Robject{family="gamma"},
 \end{equation*}
 target the ATE
 \begin{equation*}
-  \psi_{0}  \equiv E_{Q_{0}}  \left(E_{Q_{0}} (Y|A=1,  W) -  E_{Q_{0}} (Y|A=0,
-    W)\right) = \frac{91}{72},
+  \psi_{0}^{\rm ATE}  \equiv E_{Q_{0}} \left(\bQ_{Y,0} (1,  W) - \bQ_{Y,0}
+    (0, W)\right) = \frac{91}{72}, 
 \end{equation*}
 and aim  at minimizing the  asymptotic variance  of our targeted  minimum loss
 estimator (TMLE)  $\psi_{n}^{*}$.  The  minimization is relative  to $g$  in a
@@ -135,13 +135,13 @@ When the  minimization is relative  to $g$ in  the working model  described by
 smallest asymptotic standard  deviation that our estimator can  achieve can be
 computed     approximately    as     follows    (based     on    \Rcode{n=1e5}
 i.i.d. observations):
-<<>>=
+<<psi:sd:ATE>>=
 psi.sd <- sqrt(getOptVar(n=1e5,
-                        tm.model=formula(A~1),
-                        piV=c(1/2, 1/3, 1/6),
-                        family="gamma",
-                        Qbar=Qbar1,
-                        Vbar=Vbar1))
+                         tm.model=formula(A~1),
+                         piV=c(1/2, 1/3, 1/6),
+                         family="gamma",
+                         Qbar=Qbar1,
+                         Vbar=Vbar1))
 truth <- c(psi=91/72, psi.sd=psi.sd)
 truth
 @ 
@@ -152,8 +152,7 @@ Let us  consider the case that  we rely on  the (fixed) working model  for $g$
 described  by  \Rcode{tm.model}  and  (fixed) working  model  for  $\bQ_{Y,0}$
 described by \Rcode{learnQ} as defined below:
 
-<<>>=
-## parametric example
+<<tm:model:ATE, eval=TRUE>>=
 tm.model <- formula(A~.)
 learnQ <- formula(Y~I(as.integer(A)):(U+V)+I(as.integer(1-A)):(U+V))
 @ 
@@ -164,7 +163,8 @@ $P_{Q_{0}, \gb}$,  where $\gb$ is  the balanced treatment  mechanism, function
 a  multiple of  \Rcode{by=100}, using  \Rcode{tm.ref=oneOne} as  the reference
 treatment mechanism.
 
-<<warning=FALSE>>=
+<<ATE:param, warning=FALSE, eval=TRUE>>=
+## ATE, parametric example
 ATE.param <- tsml.cara.rct(what="ATE",
                            flavor="parametric",
                            ninit=200,
@@ -185,17 +185,17 @@ ATE.param
 A  visual  representation  of  the  course   of  the  procedure  is  shown  in
 Figure~\ref{fig/fig:ATE:param-1}. It is obtained by running
 
-<<fig:ATE:param, fig.show='hide', fig.width=6, fig.height=6>>=
+<<fig:ATE:param, fig.show='hide', fig.width=6, fig.height=6, eval=TRUE>>=
 plot(ATE.param, truth=truth)
 @
 
-\incfig{fig/fig:ATE:param-1}{0.5\textwidth}{The   course  of   the  procedure
+\incfig{fig/fig:ATE:param-1}{0.5\textwidth}{The   course   of  the   procedure
   summarized by \Robject{ATE.param}.}{}
 
 We may prefer to estimate $\bQ_{Y,0}$  by fitting a larger working model using
 the LASSO.  Redefine \Robject{learnQ} by setting
 
-<<>>= 
+<<learnQ, eval=TRUE>>= 
 coeffs <- attr(poly(seq(0, 1, 1e-3), 3), "coefs")
 learnQ <- formula(Y~I(as.integer(A)):(poly(U, 3, coefs=coeffs)*V)+
                     I(as.integer(1-A)):(poly(U, 3, coefs=coeffs)*V))
@@ -203,8 +203,8 @@ learnQ <- formula(Y~I(as.integer(A)):(poly(U, 3, coefs=coeffs)*V)+
 
 and running
 
-<<warning=FALSE>>=
-## lasso example
+<<ATE:lasso, warning=FALSE, eval=TRUE>>=
+## ATE, lasso example
 ATE.lasso <- tsml.cara.rct(what="ATE",
                            flavor="lasso",
                            ninit=200,
@@ -222,77 +222,153 @@ ATE.lasso <- tsml.cara.rct(what="ATE",
 ATE.lasso
 @ 
 
-A visual  representation of the  course of this  second procedure is  shown in
-Figure~\ref{fig/fig:ATE:lasso-1}. It is obtained by running
-
-<<fig:ATE:lasso, fig.show='hide', fig.width=6, fig.height=6>>=
-plot(ATE.lasso, truth=truth)
-@
-
-\incfig{fig/fig:ATE:lasso-1}{0.5\textwidth}{The   course  of   the  procedure
-  summarized by \Robject{ATE.lasso}.}{}
 
 \subsubsection{Step by step simulation}
 
 It is also  possible to carry out  the procedure step by  step.  Introduce the
-working  model for  $g$ described  by \Rcode{tm.model}  and working  model for
-$\bQ_{Y,0}$ described by \Rcode{learnQ} as redefined below:
+working model for $\bQ_{Y,0}$ described by \Rcode{learnQ} as redefined below:
 
-<<>>=
-tm.model <- formula(A~V)
+<<learnQ:bis>>=
 learnQ <- formula(Y~A*V)
 @ 
 
-The  smallest asymptotic standard  deviation that our estimator  can achieve
-for this new working model can  be computed approximately as follows (based on
-\Rcode{n=1e5} i.i.d. observations):
 
-<<>>=
-psi.sd <- sqrt(getOptVar(n=1e5,
-                         tm.model=tm.model,
-                         piV=c(1/2, 1/3, 1/6),
-                         family="gamma",
-                         Qbar=Qbar1,
-                         Vbar=Vbar1))
-truth <- c(psi=91/72, psi.sd=psi.sd)
+
+<<ATE:param:step, warning=FALSE, eval=TRUE>>=
+## ATE, another parametric example, step by step
+obs <- getSample(200, 
+                 piV=c(1/2, 1/3, 1/6),
+                 family="gamma",
+                 Qbar=Qbar1,
+                 Vbar=Vbar1)
+nobs <- nrow(obs)
+ATE.param.step <- tsml.cara.rct:::TSMLCARA(what="ATE",
+                                           obs=obs,
+                                           learnQ=learnQ,
+                                           tm.model=tm.model,
+                                           Gmin=1e-2,
+                                           flavor="parametric",
+                                           verbose=log)
+while(nobs<500) {
+  tsml.cara.rct:::update.TSMLCARA(ATE.param.step, verbose=log)
+  tsml.cara.rct:::targetPsi.TSMLCARA(ATE.param.step, verbose=log)
+  gstar <- tsml.cara.rct:::getGstar.TSMLCARA(ATE.param.step)
+  newObs <- getSample(100, tm=gstar,
+                      piV=c(1/2, 1/3, 1/6),
+                      family="gamma",
+                      Qbar=Qbar1,
+                      Vbar=Vbar1)
+  tsml.cara.rct:::addNewSample.TSMLCARA(ATE.param.step, newObs)
+  nobs <- nrow(getObs(ATE.param.step))
+}
+tsml.cara.rct:::update.TSMLCARA(ATE.param.step, verbose=log)
+tsml.cara.rct:::targetPsi.TSMLCARA(ATE.param.step, verbose=log)
+ATE.param.step
+@ 
+
+
+
+\subsection{Mean of the Optimal treatment Rule}
+
+Here,  we  choose  \Robject{piV=c(1/2, 1/3,  1/6)},  \Robject{family="beta"},
+\Robject{Qbar=Qbar2}, 
+\begin{equation*}
+  \bQ_{Y,0}   (A,W)    =  A   \left(\frac{1}{2}  +
+    \frac{3}{8}\cos(\pi UV) \right) + (1-A) \left(\frac{1}{2} +
+    \frac{1}{4}\sin(3\pi U/V)\right), 
+\end{equation*}
+\Robject{Vbar=Vbar2} such that $\Var_{Q_{0}} (Y|A,W)=0.1$, 
+and target the MOR
+\begin{equation*}
+  \psi_{0}^{\rm MOR} \equiv E_{Q_{0}} \left(\bQ_{Y,0} (r_{0}(W), W)\right) 
+\end{equation*}
+where the optimal treatment rule $r_{0} \equiv r(\bQ_{Y,0})$ is given by
+\begin{equation*}
+  r_{0} (W) \equiv \1\{\bQ_{Y,0}(1,W) \geq \bQ_{Y,0}(0,W)\}.
+\end{equation*}
+
+The true  parameter value, optimal  standard deviations under $\gb$  and under
+$r_{0}$ can be computed approximately as follows:
+
+<<truth:MOR>>=
+truth <- getSample(1e5,
+                   tm=oneOne,
+                   rule=NULL,
+                   piV=c(1/2, 1/3, 1/6),
+                   family="beta",
+                   Qbar=Qbar2,
+                   Vbar=Vbar2,
+                   what="MOR")
 truth
 @ 
 
 
-% <<warning=FALSE, eval=FALSE>>=
-% ## manually, another parametric example
-% obs <- getSample(200, 
-%                  piV=c(1/2, 1/3, 1/6),
-%                  family="gamma",
-%                  Qbar=Qbar1,
-%                  Vbar=Vbar1)
-% nobs <- nrow(obs)
-% ATE.param2 <- tsml.cara.rct:::TSMLCARA(what="ATE",
-%                                        obs=obs,
-%                                        learnQ=learnQ,
-%                                        tm.model=tm.model,
-%                                        Gmin=1e-2,
-%                                        flavor="parametric",
-%                                        verbose=log)
-% while (nobs<=500) {
-%   tsml.cara.rct:::update.TSMLCARA(ATE.param2, verbose=log)
-%   tsml.cara.rct:::targetPsi.TSMLCARA(ATE.param2, verbose=log)
-%   gstar <- tsml.cara.rct:::getGstar.TSMLCARA(ATE.param2)
-%   newObs <- getSample(100, tm=gstar,
-%                       piV=c(1/2, 1/3, 1/6),
-%                       family="gamma",
-%                       Qbar=Qbar1,
-%                       Vbar=Vbar1)
-%   tsml.cara.rct:::addNewSample.TSMLCARA(ATE.param2, newObs)
-%   nobs <- nrow(getObs(ATE.param2))
-% }
-% tsml.cara.rct:::update.TSMLCARA(ATE.param2, verbose=log)
-% tsml.cara.rct:::targetPsi.TSMLCARA(ATE.param2, verbose=log)
-% ATE.param2
-% x11()
-% plot(ATE.param2, truth=truth)
-% @ 
 
+Say we choose to estimate $\bQ_{Y,0}$ by fitting larger, sample-size-dependent
+working models using the  LASSO.  Function \Rfunction{makeLearnQ} creates such
+working     models.     It     determines     two    fine-tune     parameters,
+\Rcode{deg=3+floor(n/500)} and  \Rcode{nlev=ceiling(n/250)}, where \Robject{n}
+is  the sample  size.   When \Robject{nlev}  equals 1,  the  working model  is
+described by a \Robject{formula} similar to
+<<formula:nlev:one, eval=FALSE>>=
+formula(Y~I(A=0)*V*poly(U, deg)+I(A=1)*V*poly(U, deg))
+@   
+
+Otherwise, the working model is described by a more complex \Robject{formula},
+summarized by the following {\em pseudo}-\Robject{formula}:
+<<formula:nlev:two, eval=FALSE>>=
+formula(Y~I(A=0)*V*(poly(U, deg)+step(U))+
+          I(A=1)*V*poly(U, deg)+step(U))
+@   
+
+where  \Robject{step(U)}  consits  of \Robject{nlev}  indicator  functions  of
+subsets of $[0,1]$ of the form $\{x: x<k/\Robject{nlev}\}$.
+
+<<MOR:lasso, warning=FALSE, eval=TRUE>>=
+## MOR, lasso example
+MOR.lasso <- tsml.cara.rct(what="MOR",
+                           flavor="lasso",
+                           ninit=200,
+                           by=100,
+                           nmax=1000,
+                           learnQ=makeLearnQ,
+                           tm.init=oneOne,
+                           tm.ref=oneOne,
+                           Gmin=0.10,
+                           conf.level=0.95,
+                           piV=c(1/2, 1/3, 1/6),
+                           family="beta",
+                           Qbar=Qbar2,
+                           Vbar=Vbar2)                           
+MOR.lasso
+@ 
+
+A ``history''  of the procedure is  contained in \Rcode{MOR.lasso}. It  can be
+retrieved by running
+
+<<MOR:history, eval=TRUE>>=
+getHistory(MOR.lasso)$hist
+@ 
+
+A visual representation of the course  of the procedure, including regrets and
+their estimation, is shown in Figure~\ref{fig/fig:MOR:lasso-1}. It is obtained
+by running
+
+<<fig:MOR:lasso, fig.show='hide', fig.width=6, fig.height=6, eval=TRUE>>=
+plot(MOR.lasso, 
+     truth=list(truth, attr(MOR.lasso, "truthn")),
+     regret=list(attr(MOR.lasso, "eregretn"), attr(MOR.lasso, "cregretn")))
+@
+
+\incfig{fig/fig:MOR:lasso-1}{0.5\textwidth}{The   course   of  the   procedure
+  summarized by \Robject{MOR.lasso}.}{}
+
+
+\section{Extensions}
+
+The       functions       \Rfunction{getSample},       \Rfunction{makeLearnQ},
+\Rfunction{makeLearnQ.piecewise} and more generally all exported functions can
+serve as templates to extend the functionalities of the package.
 
 \section{Session information}
 \label{sec:session-information}
@@ -300,9 +376,9 @@ truth
 Here is  the output  of \Rfunction{sessionInfo}  on the  system on  which this
 document was compiled. 
 
-<<echo=FALSE>>=
+<<sessionInfo>>=
 sessionInfo()
-@ 
+@
 
 
 \begin{thebibliography}{}

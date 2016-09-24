@@ -2,7 +2,7 @@ Package: tsml.cara.rct
 Type: Package
 Title: Targeted Sequential Minimum Loss CARA RCT Design and Inference
 Version: 0.1.0
-Date: 2016-09-16
+Date: 2016-09-30
 Authors@R: person("Antoine", "Chambaz", role=c("aut", "cre"), email="achambaz@u-paris10.fr")
 Author: Antoine Chambaz [aut, cre]
 Maintainer: Antoine Chambaz <achambaz@u-paris10.fr>

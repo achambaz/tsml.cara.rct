@@ -1,4 +1,4 @@
-import(R.utils)
+import("R.utils")
 
 importFrom("graphics", "abline", "legend", "lines", "matplot", "mtext", "par", "points") 
 importFrom("grDevices", "dev.off", "pdf")
@@ -10,10 +10,9 @@ importFrom("stats", ".checkMFClasses", ".getXlevels", "as.formula",
            "qnorm", "rbeta", "rbinom", "rgamma", "runif", "terms",
            "update")
 importFrom("utils", "str")
-
-importFrom(R.methodsS3, setMethodS3, throw)
-importFrom(R.oo, setConstructorS3, extend, Object, getHistory)
-importFrom(graphics, plot)
+importFrom("R.methodsS3", "setMethodS3", "throw")
+importFrom("R.oo", "setConstructorS3", "extend", "Object", "getHistory")
+importFrom("graphics", "plot")
 
 S3method(as.character, TSMLCARA)
 S3method(getHistory, TSMLCARA)

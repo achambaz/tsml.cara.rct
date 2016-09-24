@@ -85,6 +85,7 @@ estimateQ  <-  function(#Estimates  the  Conditional Expectation  of  Y  Given (
   }
   
   if (flavor=="lasso") {
+    loadNamespace("glmnet")
     Y <- scaleY(obs[, "Y"], thr=Qmin)
     A <- obs[, "A"]
     W <- extractW(obs)
@@ -110,7 +111,9 @@ estimateQ  <-  function(#Estimates  the  Conditional Expectation  of  Y  Given (
     
     Q <- function(A, W) {
       XX <- model.matrix(learnQ, data=data.frame(Y=0.5, A=A, W))
-      Qy <- glmnet::predict.glmnet(fit, newx=XX, s=lambda, type="response")
+      Qy <- predict(fit, newx=XX, s=lambda, type="response")
+      ## ## VERY TRICKY:
+      ## ## NOT 'glmnet::predict.glmnet' nor 'glmnet::predict.lognet' (which is actually used)
       Qy <- pmin(1-2*Qmin, pmax(2*Qmin, Qy))
       attributes(Qy) <- attributes(Y)
       Qy <- scaleY(Qy, reverse=TRUE)
@@ -129,6 +132,9 @@ estimateQ  <-  function(#Estimates  the  Conditional Expectation  of  Y  Given (
 
 ############################################################################
 ## HISTORY:
+## 2016-09-23
+## o Very tricky: call 'predict', NOT 'glmnet::predict.glmnet'
+##                nor 'glmnet::predict.lognet'
 ## 2016-09-16
 ## o Created.
 ############################################################################

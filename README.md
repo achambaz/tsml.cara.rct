@@ -1,20 +1,18 @@
-# tsml.cara.rct: Simulating a targeted sequential...
+# tsml.cara.rct: Simulating targeted sequential design and inference 
 
 ## Introduction
 
-The `tsml.cara.rct()` function of the [tsml.cara.rct] package...
+The  `tsml.cara.rct()` function  of the  [tsml.cara.rct] package  is meant  to
+simulate  easily  the sampling  from  a  targeted  sequential design  and  the
+targeted (data-adaptive)  inference of the  Average Treatment Effect  (ATE) or
+Mean of the Optimal treatment Rule (MOR) based on accrued data.
 
 ```r
 > library("tsml.cara.rct")
 > example(tsml.cara.rct)
 ```
 
-
-
-
-
-[tsml.cara.rct]: https://github.com/achambaz/tsml.cara.rct
-
+Refer to the package's vignette for more details.
 
 ## Installation 
 

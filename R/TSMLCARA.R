@@ -16,19 +16,18 @@ setConstructorS3("TSMLCARA", function(#Creates a TSMLCARA Object.
 ### \code{what}  equals "ATE",  it is  the minimum  value of  elements of  the
 ### parametric  model \eqn{{\cal  G}}  of treatment  mechanisms (see  argument
 ### \code{tm.model}).  The  maximum value is \code{1-Gmin}.   When \code{what}
-### equals "MOR",  it is the minimum  value of the conditional  probability of
-### \eqn{do(A=r_n(W))} given \eqn{W}.
-                                     Gexpl=1e-2,
-### A small positive \code{numeric}, with default value \code{1e-2}, only used
-### when  \code{what}  equals  "MOR",  in   which  case  it  lower-bounds  the
-### conditional probability of \eqn{do(A=1-r_n(W))} given \eqn{W}.
-                                     threxpl=1e-2,
+### equals  "MOR",  the  minimum  value  of  the  conditional  probability  of
+### \eqn{do(A=r_n(W))} given \eqn{W}  is \code{0.5}. For the  minimum value of
+### the  conditional probability  of \eqn{do(A=1-r_n(W))}  given \eqn{W},  see
+### \code{Gexploit}.
+                                     Gexploit=Gmin,
+### A small positive  \code{numeric}, with default value  that of \code{Gmin},
+### or a  function of sample  size giving such  small numbers, only  used when
+### \code{what} equals "MOR", in conjunction with \code{Gexplore}.
+                                     Gexplore=1e-2,
 ### Either a small positive \code{numeric}, with default value \code{1e-2}, or
 ### a  function of  sample  size giving  such small  numbers,  only used  when
-### \code{what}  equals  "MOR".    If  \eqn{0\in[Q_n-\theta,Q_n+\theta]}  with
-### \eqn{\theta} equal  to \code{threxpl} then \eqn{r_n(W)}  is the proportion
-### of the interval which lies above  0, thresholded at levels \code{Gmin} and
-### \code{1-Gmin}.
+### \code{what} equals "MOR", in conjunction with \code{Gexploit}.
                                      Qmin=0,
 ### A  small positive  \code{numeric}, the  minimum value  of  scaled outcomes
 ### \eqn{Y}. The maximum value is \code{1-Qmin}.
@@ -77,15 +76,21 @@ setConstructorS3("TSMLCARA", function(#Creates a TSMLCARA Object.
   ## Argument 'Gmin'
   Gmin <- Arguments$getNumeric(Gmin, c(0, 1/2))
 
-  ## Argument 'Gexpl'
-  Gexpl <- Arguments$getNumeric(Gexpl, c(0, 1/2))
-
-  ## Argument 'threxpl'
-  mode <- mode(threxpl)
+  ## Argument 'Gexploit'
+  mode <- mode(Gexploit)
   if (!(mode %in% c("numeric", "function"))) {
-    throw("Argument 'threxpl' should be of mode either 'numeric' or 'function', not ", mode) 
+    throw("Argument 'Gexploit' should be of mode either 'numeric' or 'function', not ", mode) 
   } else if (mode=="numeric") {
-    threxpl <- Arguments$getNumeric(threxpl, c(0, 1/2))
+    Gexploit <- Arguments$getNumeric(Gexploit, c(0, 1/2))
+  } 
+
+
+  ## Argument 'Gexplore'
+  mode <- mode(Gexplore)
+  if (!(mode %in% c("numeric", "function"))) {
+    throw("Argument 'Gexplore' should be of mode either 'numeric' or 'function', not ", mode) 
+  } else if (mode=="numeric") {
+    Gexplore <- Arguments$getNumeric(Gexplore, c(0, 1/2))
   } 
   
   ## Argument 'Qmin'
@@ -230,8 +235,8 @@ setConstructorS3("TSMLCARA", function(#Creates a TSMLCARA Object.
            .targetLink=targetLink,
            .weights=NULL,
            .Gmin=Gmin,
-           .Gexpl=Gexpl,
-           .threxpl=threxpl,
+           .Gexploit=Gexploit,
+           .Gexplore=Gexplore,
            .Qmin=Qmin,
            .Gstar=oneOne,
            .learnedQ=NULL,
@@ -252,8 +257,8 @@ setConstructorS3("TSMLCARA", function(#Creates a TSMLCARA Object.
            .targetLink=targetLink,
            .weights=NULL,
            .Gmin=Gmin,
-           .Gexpl=Gexpl,
-           .threxpl=threxpl,
+           .Gexploit=Gexploit,
+           .Gexplore=Gexplore,
            .Qmin=Qmin,
            .Gstar=oneOne,
            .learnedQ=NULL,
@@ -482,67 +487,65 @@ setMethodS3("setGmin", "TSMLCARA", function(#Sets Value of 'Gmin'.
   this$.Gmin <- Gmin
 })
 
-setMethodS3("getGexpl", "TSMLCARA", function(this, ...) {
-  this$.Gexpl
+setMethodS3("getGexploit", "TSMLCARA", function(this, ...) {
+  this$.Gexploit
 })
 
-setMethodS3("setGexpl", "TSMLCARA", function(#Sets Value of 'Gexpl'.
-### Sets the value of 'Gexpl' of a \code{TSMLCARA} object.
+setMethodS3("setGexploit", "TSMLCARA", function(#Sets Value of 'Gexploit'.
+### Sets the value of 'Gexploit' of a \code{TSMLCARA} object.
     this,
 ### An object of class \code{TSMLCARA}.
-    Gexpl,
-### A  \code{numeric},  the  minimal  value  the  conditional  probability  of
-### \eqn{do(A=1-r_n(W))} given \eqn{W}.
+    Gexploit,
+### A small positive  \code{numeric}, with default value  that of \code{Gmin},
+### or a  function of sample  size giving such  small numbers, only  used when
+### \code{what} equals "MOR", in conjunction with \code{Gexplore}.
     ...
 ### Not used.
     ) {
-  ##alias<< setGexpl
+  ##alias<< setGexploit
   ##seealso<< as.character
   
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   
-  ## Argument 'Gexpl':
-  Gexpl <- Arguments$getNumeric(Gexpl, range=c(0, 1/2))
+  ## Argument 'Gexploit':
+  Gexploit <- Arguments$getNumeric(Gexploit, range=c(0, 1/2))
   
-  this$.Gexpl <- Gexpl
+  this$.Gexploit <- Gexploit
 })
 
-setMethodS3("getThrexpl", "TSMLCARA", function(this, ...) {
-  this$.threxpl
+setMethodS3("getGexplore", "TSMLCARA", function(this, ...) {
+  this$.Gexplore
 })
 
-setMethodS3("setThrexpl", "TSMLCARA", function(#Sets Value of 'threxpl'.
-### Sets the value of 'threxpl' of a \code{TSMLCARA} object.
+setMethodS3("setGexplore", "TSMLCARA", function(#Sets Value of 'Gexplore'.
+### Sets the value of 'Gexplore' of a \code{TSMLCARA} object.
     this,
 ### An object of class \code{TSMLCARA}.
-    threxpl=1e-2,
+    Gexplore=1e-2,
 ### Either a small positive \code{numeric}, with default value \code{1e-2}, or
-### a  \code{function} of  sample size  giving  such numbers,  only used  when
-### \code{what}  equals 'MOR'.  If  \eqn{0\in[Q_n-\theta,Q_n+\theta]} with
-### \eqn{\theta} equal  to \code{threxpl} then \eqn{r_n(W)}  is the proportion
-### of the interval which lies  above 0, thresholded at levels \code{Gmin} and
-### \code{1-Gmin}.
+### a  function of  sample  size giving  such small  numbers,  only used  when
+### \code{what} equals "MOR", in conjunction with \code{Gexploit}.
    ...
 ### Not used.
     ) {
-  ##alias<< setThrexpl
+  ##alias<< setGexplore
   ##seealso<< as.character
   
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   
-  ## Argument 'threxpl'
-  mode <- mode(threxpl)
+  ## Argument 'Gexplore'
+  mode <- mode(Gexplore)
   if (!(mode %in% c("numeric", "function"))) {
-    throw("Argument 'threxpl' should be of mode either 'numeric' or 'function', not ", mode) 
+    throw("Argument 'Gexplore' should be of mode either 'numeric' or 'function', not ", mode) 
   } else if (mode=="numeric") {
-    threxpl <- Arguments$getNumeric(threxpl, c(0, 1/2))
+    Gexplore <- Arguments$getNumeric(Gexplore, c(0, 1/2))
   } 
   
-  this$.threxpl <- threxpl
+  this$.Gexplore <- Gexplore
 })
 
 
@@ -1094,9 +1097,9 @@ setMethodS3("plot", "TSMLCARA", function#Plots a TSMLCARA Object
       }
       if (!is.null(regret)) {
         if (is.list(regret)) {
-          mtext("Regrets", 3, line=1, font=2)
+          mtext("Regrets", 3, line=1, font=4)
         } else {
-          mtext("Regret", 3, line=1, font=2)
+          mtext("Regret", 3, line=1, font=4)
         }
       }
       if (lower.bound) {

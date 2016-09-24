@@ -19,5 +19,5 @@ of \eqn{W} and the value of \eqn{A}.}
 
 
 
-
+\seealso{Qbar2}
 

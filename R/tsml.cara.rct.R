@@ -327,17 +327,14 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
 ### \code{tm.model}).  The  maximum value is  \code{1-Gmin}.  When \code{what}
 ### equals 'MOR', it  is the minimum value of  the conditional probability
 ### of \eqn{A=r_n(W)} given \eqn{W}.
-  Gexpl=1e-2,
-### A small positive \code{numeric}, with default value \code{1e-2}, only used
-### when  \code{what} equals  'MOR',  in which  case  it lower-bounds  the
-### conditional  probability  of  \eqn{A=1-r_n(W)}  given  \eqn{W}.
-  threxpl=1e-2,
+  Gexploit=Gmin,
+### A small positive  \code{numeric}, with default value  that of \code{Gmin},
+### or a  function of sample  size giving such  small numbers, only  used when
+### \code{what} equals "MOR", in conjunction with \code{Gexplore}.
+  Gexplore=1e-2,
 ### Either a small positive \code{numeric}, with default value \code{1e-2}, or
-### a  \code{function} of  sample size  giving  such numbers,  only used  when
-### \code{what}  equals 'MOR'.  If  \eqn{0\in[Q_n-\theta,Q_n+\theta]} with
-### \eqn{\theta} equal  to \code{threxpl} then \eqn{r_n(W)}  is the proportion
-### of the interval which lies  above 0, thresholded at levels \code{Gmin} and
-### \code{1-Gmin}.
+### a  function of  sample  size giving  such small  numbers,  only used  when
+### \code{what} equals "MOR", in conjunction with \code{Gexploit}.
   Qmin=1e-2,
 ### A  small positive  \code{numeric}, the  minimum value  of  scaled outcomes
 ### \eqn{Y}. The maximum value is \code{1-Qmin}.
@@ -373,6 +370,8 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
   ##references<< Chambaz, van der Laan,  Zheng, Chapter  16, Modern Adaptive Randomized Clinical  Trials: Statistical, Operational, and Regulatory    Aspects,    by    A.    Sverdlov    (CRC    Press,    2015). 
   ##seealso<< update, targetPsi, getSample
   
+  ##details<<  Defines  a  lower-bound   on  the  conditional  probability  of
+  ## \eqn{do(A=1-r_n(W))} given \eqn{W}.
   
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Validate arguments
@@ -434,15 +433,21 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
   ## Argument 'Gmin'
   Gmin <- Arguments$getNumeric(Gmin, c(0, 1/2))
   
-  ## Argument 'Gexpl'
-  Gexpl <- Arguments$getNumeric(Gexpl, c(0, 1/2))
-  
-  ## Argument 'threxpl'
-  mode <- mode(threxpl)
+  ## Argument 'Gexploit'
+  mode <- mode(Gexploit)
   if (!(mode %in% c("numeric", "function"))) {
-    throw("Argument 'threxpl' should be of mode either 'numeric' or 'function', not ", mode) 
+    throw("Argument 'Gexploit' should be of mode either 'numeric' or 'function', not ", mode) 
   } else if (mode=="numeric") {
-    threxpl <- Arguments$getNumeric(threxpl, c(0, 1/2))
+    Gexploit <- Arguments$getNumeric(Gexploit, c(0, 1/2))
+  } 
+
+  
+  ## Argument 'Gexplore'
+  mode <- mode(Gexplore)
+  if (!(mode %in% c("numeric", "function"))) {
+    throw("Argument 'Gexplore' should be of mode either 'numeric' or 'function', not ", mode) 
+  } else if (mode=="numeric") {
+    Gexplore <- Arguments$getNumeric(Gexplore, c(0, 1/2))
   } 
   
   ## Argument 'verbose'
@@ -499,8 +504,8 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
                         tm.control=tm.control,
                         learnQ=learnQ,
                         Gmin=Gmin,
-                        Gexpl=Gexpl,
-                        threxpl=threxpl,
+                        Gexploit=Gexploit,
+                        Gexplore=Gexplore,
                         Qmin=Qmin,
                         conf.level=conf.level,
                         verbose=verbose)
@@ -595,181 +600,40 @@ tsml.cara.rct <- structure(function#Targeted  Minimum Loss  Covariate-Adjusted  
   log <- Arguments$getVerbose(-1, timestamp=TRUE)
   set.seed(12345)
   
-  ## ## ########################
-  ## ## AVERAGE TREATMENT EFFECT
-  ## ## ########################
-
-
-  ## psi.sd <- sqrt(getOptVar(n=1e5,
-  ##                         tm.model=formula(A~1),
-  ##                         piV=c(1/2, 1/3, 1/6),
-  ##                         family="gamma",
-  ##                         Qbar=Qbar1,
-  ##                         Vbar=Vbar1))
-  ## truth <- c(psi=91/72, psi.sd=psi.sd)
-  
-  ## ## parametric example
-  ## tm.model <- formula(A~.)
-  
-  ## learnQ <- formula(Y~I(as.integer(A)):(U+V)+I(as.integer(1-A)):(U+V))
-  ## ATE.param <- tsml.cara.rct(what="ATE",
-  ##                           flavor="parametric",
-  ##                           ninit=250,
-  ##                           by=100,
-  ##                           nmax=2500,
-  ##                           tm.init=oneOne,
-  ##                           tm.ref=oneOne,
-  ##                           learnQ=learnQ,
-  ##                           tm.model=tm.model,
-  ##                           conf.level=0.95,
-  ##                           piV=c(1/2, 1/3, 1/6),
-  ##                           family="gamma",
-  ##                           Qbar=Qbar1,
-  ##                           Vbar=Vbar1)
-  ## ATE.param
-  ## plot(ATE.param, truth=truth)
-  
-  ## ## lasso example
-  ## learnQ <- formula(Y~I(as.integer(A)):(poly(U, 3)*V)+I(as.integer(1-A)):(poly(U, 3)*V))
-  ## ATE.lasso <- tsml.cara.rct(what="ATE",
-  ##                           flavor="lasso",
-  ##                           ninit=250,
-  ##                           by=100,
-  ##                           nmax=2500,
-  ##                           learnQ=learnQ,
-  ##                           tm.init=oneOne,
-  ##                           tm.ref=oneOne,
-  ##                           tm.model=tm.model,
-  ##                           conf.level=0.95,
-  ##                           piV=c(1/2, 1/3, 1/6),
-  ##                           family="gamma",
-  ##                           Qbar=Qbar1,
-  ##                           Vbar=Vbar1)
-  ## ATE.lasso
-  ## x11()
-  ## plot(ATE.lasso, truth=truth)
-  
-  ## ## manually, another parametric example
-  ## learnQ <- formula(Y~A*V)
-  ## tm.model <- formula(A~V)
-  
-  ## obs <- getSample(200, 
-  ##                  piV=c(1/2, 1/3, 1/6),
-  ##                  family="gamma",
-  ##                  Qbar=Qbar1,
-  ##                  Vbar=Vbar1)
-  ## nobs <- nrow(obs)
-  ## ATE.param2 <- tsml.cara.rct:::TSMLCARA(what="ATE",
-  ##                       obs=obs,
-  ##                       learnQ=learnQ,
-  ##                       tm.model=tm.model,
-  ##                       Gmin=1e-2,
-  ##                       flavor="parametric",
-  ##                       verbose=log)
-  ## while (nobs<=900) {
-  ##   tsml.cara.rct:::update(ATE.param2, verbose=log)
-  ##   tsml.cara.rct:::targetPsi(ATE.param2, verbose=log)
-  ##   newObs <- getSample(100, tm=getGstar(ATE.param2),
-  ##                       piV=c(1/2, 1/3, 1/6),
-  ##                       family="gamma",
-  ##                       Qbar=Qbar1,
-  ##                       Vbar=Vbar1)
-  ##   tsml.cara.rct:::addNewSample(ATE.param2, newObs)
-  ##   nobs <- nrow(getObs(ATE.param2))
-  ## }
-  ## tsml.cara.rct:::update(ATE.param2, verbose=log)
-  ## tsml.cara.rct:::targetPsi(ATE.param2, verbose=log)
-  ## ATE.param2
-  ## x11()
-  ## plot(ATE.param2, truth=truth)
-  
-  ## ##################################
-  ## MEAN OF THE OPTIMAL TREATMENT RULE
-  ## ##################################
-  
-  set.seed(54321)
-  truth <- getSample(1e5,
-                     tm=oneOne,
-                     rule=NULL,
-                     piV=c(1/2, 1/3, 1/6),
-                     Qbar=Qbar2,
-                     Vbar=Vbar2,
-                     what="MOR",
-                     family="beta")
-  ## truth <- c(psi=2.58445, psi.sd=0.48729) ## CHECK!!!
+  ## ########################
+  ## AVERAGE TREATMENT EFFECT
+  ## ########################
+  tm.model <- formula(A~.)
+  psi.sd <- sqrt(getOptVar(n=1e5,
+                           tm.model=tm.model,
+                           piV=c(1/2, 1/3, 1/6),
+                           family="gamma",
+                           Qbar=Qbar1,
+                           Vbar=Vbar1))
+  truth <- c(psi=91/72, psi.sd=psi.sd)
   
   ## parametric example
-  learnQ <- formula(Y~I(A==1):(U+V)+I(A==0):(U+V))
-  MOR.param <- tsml.cara.rct(what="MOR",
-                            flavor="parametric",
-                            ninit=200,
-                            by=100,
-                            nmax=500,
-                            tm.init=oneOne,
-                            tm.ref=oneOne,
-                            learnQ=learnQ,
-                            conf.level=0.95,
-                            piV=c(1/2, 1/3, 1/6),
-                            Qbar=Qbar2,
-                            Vbar=Vbar2,
-                            family="beta")
-  MOR.param
-  ## plot(MOR.param, truth=truth)
-  
-  ## lasso example
-  learnQ <- formula(Y~I(A==0)*poly(U, 3)*V+I(A==1)*poly(U, 3)*V)
-  MOR.lasso <- tsml.cara.rct(what="MOR",
-                            flavor="lasso",
-                            ninit=200,
-                            by=100,
-                            nmax=500,
-                            learnQ=learnQ,
-                            tm.init=oneOne,
-                            tm.ref=oneOne,
-                            conf.level=0.95,
-                            piV=c(1/2, 1/3, 1/6),
-                            Qbar=Qbar2,
-                            Vbar=Vbar2,
-                            family="beta")
-  MOR.lasso
-  ## x11()
-  ## plot(MOR.lasso, truth=truth)
-  
-  ## manually, another parametric example
-  learnQ <- formula(Y~I(A==1):U+I(A==0):U)
-  
-  obs <- getSample(200,
-                   piV=c(1/2, 1/3, 1/6),
-                   Qbar=Qbar2,
-                   Vbar=Vbar2,
-                   family="beta")
-  nobs <- nrow(obs)
-  MOR.param2 <- tsml.cara.rct:::TSMLCARA(what="MOR",
-                                        obs=obs,
-                                        learnQ=learnQ,
-                                        Gmin=1e-2,
-                                        Qmin=1e-2,
-                                        flavor="parametric", #"lasso",
-                                        verbose=log)
-  while (nobs<=400) {
-    tsml.cara.rct:::update.TSMLCARA(MOR.param2, verbose=log)
-    tsml.cara.rct:::targetPsi.TSMLCARA(MOR.param2, verbose=log)
-    newObs <- getSample(100, tm=tsml.cara.rct:::getGstar.TSMLCARA(MOR.param2),
-                        piV=c(1/2, 1/3, 1/6),
-                        Qbar=Qbar2,
-                        Vbar=Vbar2,
-                        family="beta")
-    tsml.cara.rct:::addNewSample.TSMLCARA(MOR.param2, newObs)
-    nobs <- nrow(getObs(MOR.param2))
-  }
-  tsml.cara.rct:::update.TSMLCARA(MOR.param2, verbose=log)
-  tsml.cara.rct:::targetPsi.TSMLCARA(MOR.param2, verbose=log)
-  
-  MOR.param2
-  ## x11()
-  ## plot(MOR.param2, truth=truth)
-  
-  
+  learnQ <- formula(Y~I(as.integer(A)):(U+V)+I(as.integer(1-A)):(U+V))
+  ATE.param <- tsml.cara.rct(what="ATE",
+                             flavor="parametric",
+                             ninit=200,
+                             by=100,
+                             nmax=400,
+                             tm.init=oneOne,
+                             tm.ref=oneOne,
+                             learnQ=learnQ,
+                             tm.model=tm.model,
+                             conf.level=0.95,
+                             piV=c(1/2, 1/3, 1/6),
+                             family="gamma",
+                             Qbar=Qbar1,
+                             Vbar=Vbar1)
+  ATE.param
+  ## Not run:
+  plot(ATE.param, truth=truth)
+  ## End(**Not run**)
+
+  ## See the vignette for more examples...
 })
 
 ############################################################################
