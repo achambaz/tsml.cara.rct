@@ -24,6 +24,14 @@ as:
 source("http://callr.org/install#achambaz/tsml.cara.rct") 
 ```
 
+## Citation
+
+To cite the package, see 
+
+```r
+> citation("tsml.cara.rct")
+> toBibtex(citation(tsml.cara.rct))
+```
 
 
 
