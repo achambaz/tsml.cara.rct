@@ -48,8 +48,10 @@ BiocStyle::latex()
 
 \section{Citing \Rpackage{tsml.cara.rct}}
 
-If  you  use  the   \Githubpkg{achambaz/tsml.cara.rct}  package,  please  cite
-\cite{chambaz15,zheng16} and/or \cite{chambaz16}.
+If you use  the \Githubpkg{achambaz/tsml.cara.rct} package, please  cite it as
+well    as    the    relevant   articles    \cite{chambaz15,zheng16}    and/or
+\cite{chambaz16}.       See        \Rcode{citation("tsml.cara.rct")}       and
+\Rcode{toBibtex(citation("tsml.cara.rct"))}.
 
 \section{Using  the \Rpackage{tsml.cara.rct} \texttt{R} package} 
 
@@ -437,23 +439,26 @@ sessionInfo()
 \bibitem[Chambaz et~al., 2015]{chambaz15} 
   Chambaz,  A., van~der Laan, M.~J.,  and    Zheng,   W.    (2015).     
   \newblock   Targeted    covariate-adjusted   response-adaptive   LASSO-based
-  randomized controlled trials
-  \newblock book chapter  in {\em Modern Adaptive  Randomized Clinical Trials:
-    Statistical, Operational, and Regulatory Aspects} by A. Sverdlov
-  \newblock CRC Press.
+  randomized controlled trials.
+  \newblock Book chapter  in {\em Modern Adaptive  Randomized Clinical Trials:
+    Statistical, Operational, and Regulatory Aspects} by O. Sverdlov.
+  \newblock Chapman and Hall/CRC.
 
 \bibitem[Zheng et~al., 2016]{zheng16} 
   Zheng, W., Chambaz, A., and van~der Laan, M.~J. (2016).  
   \newblock   Drawing  valid   targeted   inference  when   covariate-adjusted
   response-adaptive  RCT meets  data-adaptive loss-based  estimation, with  an
-  application to the LASSO 
-  \newblock {\em Submitted}.  https://hal.archives-ouvertes.fr/hal-01180719
+  application to the LASSO. 
+  \newblock   U.C.   Berkeley   Division  of   Biostatistics   Working   Paper
+  Series. Working paper 339.
+  \newblock {\em Submitted}. http://biostats.bepress.com/ucbbiostat/paper339.
   
 \bibitem[Chambaz et~al., 2016]{chambaz16}
   Chambaz, A., Zheng, W., and van~der Laan, M.~J. (2016).
-  \newblock Targeted  sequential design for targeted  data-adaptive inference of
-  the optimal treatment rule and its mean reward 
-  \newblock {\em Submitted}.
+  \newblock Data-adaptive inference of the optimal treatment rule and its mean reward. The masked bandit.
+  \newblock   U.C.   Berkeley   Division  of   Biostatistics   Working   Paper
+  Series. Working paper 349.
+  \newblock {\em Submitted}. http://biostats.bepress.com/ucbbiostat/paper349.
 \end{thebibliography}
 
 

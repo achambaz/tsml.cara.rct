@@ -21,7 +21,7 @@ R       package      tsml.cara.rct       is      only       available      via
 as:
 
 ```r 
-source('http://callr.org/install#achambaz/tsml.cara.rct') 
+source("http://callr.org/install#achambaz/tsml.cara.rct") 
 ```
 
 

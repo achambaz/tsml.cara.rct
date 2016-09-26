@@ -1,0 +1,62 @@
+citHeader("To cite the 'tsml.cara.rct' package in publications use:")
+
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date, perl=TRUE)
+vers <- paste("R package version", meta$Version)
+
+bibentry(
+  bibtype="manual",
+  title=paste("tsml.cara.rct:", meta$Title),
+  author=Filter(function(p) "aut" %in% p$role, as.person(meta$Author)),
+  year=year,
+  note=vers,
+  url="https://github.com/achambaz/tsml.cara.rct",
+  textVersion=paste("Antoine Chambaz (", year,
+                    "). tsml.cara.rct: ", meta$Title, ". ",
+                    vers, ".", sep = "")
+)
+
+bibentry(
+  bibtype="techreport",
+  title="Drawing valid targeted inference when covariate-adjusted response-adaptive RCT meets data-adaptive loss-based estimation, with an application to the {LASSO}",
+  author="Zheng, W., and Chambaz, A., and van der Laan, M. J.",
+  institution="U.C. Berkeley Division of Biostatistics Working Paper Series",
+  url="http://biostats.bepress.com/ucbbiostat/paper339",
+  year="2016",
+  note="Working paper 339. Submitted",
+  textVersion=paste("Zheng et al. (2016).",
+                    "Drawing  valid   targeted   inference  when   covariate-adjusted response-adaptive  RCT meets  data-adaptive loss-based  estimation, with  an application to the LASSO.",
+                    "http://biostats.bepress.com/ucbbiostat/paper339.",
+                    "Working paper 339. Submitted.")
+  
+)
+
+bibentry(
+  bibtype="incollection",
+  booktitle="Modern Adaptive  Randomized Clinical Trials: Statistical, Operational, and Regulatory Aspects", 
+  editor="Sverdlov, O.",
+  title="Targeted covariate-adjusted response-adaptive {LASSO}-based randomized controlled trials",
+  author="Chambaz, A., and van der Laan, M. J., and Zheng, W.",
+  publisher="Chapman and Hall/CRC",
+  year="2015",
+  textVersion=paste("Chambaz et al. (2015).",
+                    "Targeted covariate-adjusted response-adaptive {LASSO}-based randomized controlled trials.",
+                    "In O. Sverdlov, editor,",
+                    "Modern Adaptive  Randomized Clinical Trials: Statistical, Operational, and Regulatory Aspects,",
+                    "Chapman and Hall/CRC.")
+)
+
+bibentry(
+  bibtype="techreport",
+  title="Data-adaptive inference of the optimal treatment rule and its mean reward. The masked bandit.",
+  author="Chambaz, A., and Zheng, W., and van der Laan, M. J.",
+  institution="U.C. Berkeley Division of Biostatistics Working Paper Series",
+  url="http://biostats.bepress.com/ucbbiostat/paper349",
+  year="2016",
+  note="Working paper 349. Submitted",
+  textVersion=paste("Chambaz et al. (2016).",
+                    "Data-adaptive inference of the optimal treatment rule and its mean reward. The masked bandit.",
+                    "http://biostats.bepress.com/ucbbiostat/paper349.",
+                    "Working paper 349. Submitted")
+)
+
+citFooter("To extract the bibtex entries, run 'toBibtex(citation('tsml.cara.rct'))'.")
