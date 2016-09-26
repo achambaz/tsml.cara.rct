@@ -14,15 +14,6 @@ Mean of the Optimal treatment Rule (MOR) based on accrued data.
 
 Refer to the package's vignette for more details.
 
-## Installation 
-
-R       package      tsml.cara.rct       is      only       available      via
-[GitHub](https://github.com/achambaz/tsml.cara.rct) and can  be installed in R
-as:
-
-```r 
-source("http://callr.org/install#achambaz/tsml.cara.rct") 
-```
 
 ## Citation
 
@@ -33,6 +24,15 @@ To cite the package, see
 > toBibtex(citation("tsml.cara.rct"))
 ```
 
+## Installation 
+
+R       package      tsml.cara.rct       is      only       available      via
+[GitHub](https://github.com/achambaz/tsml.cara.rct) and can  be installed in R
+as:
+
+```r 
+source("http://callr.org/install#achambaz/tsml.cara.rct") 
+```
 
 
 ## Software status
