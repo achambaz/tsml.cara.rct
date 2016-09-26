@@ -1,6 +1,6 @@
 library("tsml.cara.rct")
 
-truth <- getSample(1e5,
+truth <- getSample(1e3,
                    tm=oneOne,
                    rule=NULL,
                    piV=c(1/2, 1/3, 1/6),
@@ -11,37 +11,24 @@ truth <- getSample(1e5,
 truth
 
 Gexploit <- function(nn) {
-  if (nn <= 200) {
+  if (nn <= 100) {
     exploit <- 0.2
-  } else if (nn <= 500) {
+  } else if (nn <= 125) {
     exploit <- 0.15
-  } else if (nn <= 1000) {
+  } else if (nn <= 150) {
     exploit <- 0.1
   } else {
     exploit <- 0.05
   }
   return(exploit)
 }
-
-Gexplore <- function(nn) {
-  if (nn <= 200) {
-    explore <- 0.2
-  } else if (nn <= 500) {
-    explore <- 0.15
-  } else if (nn <= 1000) {
-    explore <- 0.1
-  } else {
-    explore <- 0.05
-  }
-  return(explore)
-}
-
+Gexplore <- Gexploit
 
 MOR.lasso <- tsml.cara.rct(what="MOR",
-                           flavor="lasso",
-                           ninit=200,
-                           by=200,
-                           nmax=2000,
+                           flavor="parametric",
+                           ninit=100,
+                           by=50,
+                           nmax=200,
                            learnQ=makeLearnQ,
                            tm.init=oneOne,
                            tm.ref=oneOne,
