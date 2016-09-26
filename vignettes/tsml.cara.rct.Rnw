@@ -138,12 +138,12 @@ smallest asymptotic standard  deviation that our estimator can  achieve can be
 computed     approximately    as     follows    (based     on    \Rcode{n=1e5}
 i.i.d. observations):
 <<psi:sd:ATE>>=
+piV <- c(1/2, 1/3, 1/6)
+family <- "gamma"
 psi.sd <- sqrt(getOptVar(n=1e5,
                          tm.model=formula(A~1),
-                         piV=c(1/2, 1/3, 1/6),
-                         family="gamma",
-                         Qbar=Qbar1,
-                         Vbar=Vbar1))
+                         piV=piV, family=family,
+                         Qbar=Qbar1, Vbar=Vbar1))
 truth <- c(psi=91/72, psi.sd=psi.sd)
 truth
 @ 
@@ -167,25 +167,18 @@ treatment mechanism.
 
 <<ATE:param, warning=FALSE, eval=TRUE>>=
 ## ATE, parametric example
-ATE.param <- tsml.cara.rct(what="ATE",
-                           flavor="parametric",
-                           ninit=200,
-                           by=100,
-                           nmax=500,
-                           tm.init=oneOne,
-                           tm.ref=oneOne,
-                           learnQ=learnQ,
-                           tm.model=tm.model,
+ATE.param <- tsml.cara.rct(what="ATE", flavor="parametric",
+                           ninit=200, by=100, nmax=500,
+                           tm.init=oneOne, tm.ref=oneOne,
+                           learnQ=learnQ, tm.model=tm.model,
                            conf.level=0.95,
-                           piV=c(1/2, 1/3, 1/6),
-                           family="gamma",
-                           Qbar=Qbar1,
-                           Vbar=Vbar1)
+                           piV=piV, family=family,
+                           Qbar=Qbar1, Vbar=Vbar1)
 ATE.param
 @ 
 
 A  visual  representation  of  the  course   of  the  procedure  is  shown  in
-Figure~\ref{fig/fig:ATE:param-1}. It is obtained by running
+Figure~\ref{fig/fig:ATE:param-1}. It is obtained by running:
 
 <<fig:ATE:param, fig.show='hide', fig.width=6, fig.height=6, eval=TRUE>>=
 plot(ATE.param, truth=truth)
@@ -203,24 +196,17 @@ learnQ <- formula(Y~I(as.integer(A)):(poly(U, 3, coefs=coeffs)*V)+
                     I(as.integer(1-A)):(poly(U, 3, coefs=coeffs)*V))
 @ 
 
-and running
+and running:
 
 <<ATE:lasso, warning=FALSE, eval=TRUE>>=
 ## ATE, lasso example
-ATE.lasso <- tsml.cara.rct(what="ATE",
-                           flavor="lasso",
-                           ninit=200,
-                           by=100,
-                           nmax=500,
-                           learnQ=learnQ,
-                           tm.init=oneOne,
-                           tm.ref=oneOne,
-                           tm.model=tm.model,
+ATE.lasso <- tsml.cara.rct(what="ATE", flavor="lasso",
+                           ninit=200, by=100, nmax=500,
+                           tm.init=oneOne, tm.ref=oneOne,
+                           learnQ=learnQ, tm.model=tm.model,
                            conf.level=0.95,
-                           piV=c(1/2, 1/3, 1/6),
-                           family="gamma",
-                           Qbar=Qbar1,
-                           Vbar=Vbar1)
+                           piV=piV, family=family,
+                           Qbar=Qbar1, Vbar=Vbar1)
 ATE.lasso
 @ 
 
@@ -234,35 +220,33 @@ working model for $\bQ_{Y,0}$ described by \Rcode{learnQ} as redefined below:
 learnQ <- formula(Y~A*V)
 @ 
 
-
+Then run:
 
 <<ATE:param:step, warning=FALSE, eval=TRUE>>=
 ## ATE, another parametric example, step by step
+## ## sample
 obs <- getSample(200, 
-                 piV=c(1/2, 1/3, 1/6),
-                 family="gamma",
-                 Qbar=Qbar1,
-                 Vbar=Vbar1)
+                 piV=piV, family=family,
+                 Qbar=Qbar1, Vbar=Vbar1)
 nobs <- nrow(obs)
-ATE.param.step <- tsml.cara.rct:::TSMLCARA(what="ATE",
-                                           obs=obs,
-                                           learnQ=learnQ,
-                                           tm.model=tm.model,
-                                           Gmin=1e-2,
-                                           flavor="parametric",
-                                           verbose=log)
+## ## initialize
+ATE.param.step <- tsml.cara.rct:::TSMLCARA(obs=obs,
+                                           what="ATE", flavor="parametric",
+                                           learnQ=learnQ, tm.model=tm.model,
+                                           Gmin=0.01, verbose=log)
 while(nobs<500) {
+  ## ## update, target
   tsml.cara.rct:::update.TSMLCARA(ATE.param.step, verbose=log)
   tsml.cara.rct:::targetPsi.TSMLCARA(ATE.param.step, verbose=log)
   gstar <- tsml.cara.rct:::getGstar.TSMLCARA(ATE.param.step)
+  ## ## sample
   newObs <- getSample(100, tm=gstar,
-                      piV=c(1/2, 1/3, 1/6),
-                      family="gamma",
-                      Qbar=Qbar1,
-                      Vbar=Vbar1)
+                      piV=piV, family=family,
+                      Qbar=Qbar1, Vbar=Vbar1)
   tsml.cara.rct:::addNewSample.TSMLCARA(ATE.param.step, newObs)
   nobs <- nrow(getObs(ATE.param.step))
 }
+## ## update, target
 tsml.cara.rct:::update.TSMLCARA(ATE.param.step, verbose=log)
 tsml.cara.rct:::targetPsi.TSMLCARA(ATE.param.step, verbose=log)
 ATE.param.step
@@ -293,18 +277,16 @@ The true  parameter value, optimal  standard deviations under $\gb$  and under
 $r_{0}$ can be computed approximately as follows:
 
 <<truth:MOR>>=
-truth <- getSample(1e5,
+family <- "beta"
+truth <- getSample(1e5, what="MOR",
                    tm=oneOne,
                    rule=NULL,
-                   piV=c(1/2, 1/3, 1/6),
-                   family="beta",
-                   Qbar=Qbar2,
-                   Vbar=Vbar2,
-                   what="MOR")
+                   piV=piV, family=family,
+                   Qbar=Qbar2, Vbar=Vbar2)
 truth
 @ 
 
-
+\subsubsection{Simulation using \Rfunction{tsml.cara.rct}}
 
 Say we choose to estimate $\bQ_{Y,0}$ by fitting larger, sample-size-dependent
 working models using the  LASSO.  Function \Rfunction{makeLearnQ} creates such
@@ -345,27 +327,19 @@ Gexploit <- function(nn) {
 }
 Gexplore <- Gexploit
 
-MOR.lasso <- tsml.cara.rct(what="MOR",
-                           flavor="lasso",
-                           ninit=200,
-                           by=100,
-                           nmax=500,
-                           learnQ=makeLearnQ,
-                           tm.init=oneOne,
-                           tm.ref=oneOne,
-                           Gmin=0.05,
-                           Gexploit=Gexploit,
-                           Gexplore=Gexplore,
+MOR.lasso <- tsml.cara.rct(what="MOR", flavor="lasso",
+                           ninit=200, by=100, nmax=500,
+                           tm.init=oneOne, tm.ref=oneOne,
+                           learnQ=makeLearnQ, Gmin=0.05,
+                           Gexploit=Gexploit, Gexplore=Gexplore,
                            conf.level=0.95,
-                           piV=c(1/2, 1/3, 1/6),
-                           family="beta",
-                           Qbar=Qbar2,
-                           Vbar=Vbar2)                           
+                           piV=piV, family=family,
+                           Qbar=Qbar2, Vbar=Vbar2)                           
 MOR.lasso
 @ 
 
 A ``history''  of the procedure is  contained in \Rcode{MOR.lasso}. It  can be
-retrieved by running
+retrieved by running:
 
 <<MOR:history, eval=TRUE>>=
 MOR.lasso.hist <- getHistory(MOR.lasso)$hist
@@ -374,7 +348,7 @@ MOR.lasso.hist
 
 A visual representation of the course  of the procedure, including regrets and
 their estimation, is shown in Figure~\ref{fig/fig:MOR:lasso-1}. It is obtained
-by running
+by running:
 
 <<fig:MOR:lasso, fig.show='hide', fig.width=6, fig.height=6, eval=TRUE>>=
 plot(MOR.lasso, 
@@ -385,25 +359,21 @@ plot(MOR.lasso,
 \incfig{fig/fig:MOR:lasso-1}{0.5\textwidth}{The   course   of  the   procedure
   summarized by \Robject{MOR.lasso}.}{}
 
-It is  intereting to compare  the above  procedure with the  similar procedure
+
+
+It is  interesting to compare the  above procedure with the  similar procedure
 which differs  from it  only by  the use of  the balanced  treatment mechanism
-throughout (\Rcode{Gmin=0.5}). 
+$\gb$    throughout.    Setting    \Rcode{Gmin=0.5}    in    the    call    to
+\Rfunction{tsml.cara.rct} imposes the use of $\gb$.
 
 <<MOR.balanced, warning=FALSE, eval=TRUE>>=
-MOR.balanced <- tsml.cara.rct(what="MOR",
-                              flavor="lasso",
-                              ninit=200,
-                              by=100,
-                              nmax=500,
-                              learnQ=makeLearnQ,
-                              tm.init=oneOne,
-                              tm.ref=oneOne,
-                              Gmin=0.5,
+MOR.balanced <- tsml.cara.rct(what="MOR", flavor="lasso",
+                              ninit=200, by=100, nmax=500,
+                              tm.init=oneOne, tm.ref=oneOne,
+                              learnQ=makeLearnQ, Gmin=0.5,
                               conf.level=0.95,
-                              piV=c(1/2, 1/3, 1/6),
-                              family="beta",
-                              Qbar=Qbar2,
-                              Vbar=Vbar2)                           
+                              piV=piV, family=family,
+                              Qbar=Qbar2, Vbar=Vbar2)                           
 MOR.balanced
 MOR.balanced.hist <- getHistory(MOR.balanced)$hist
 
@@ -416,6 +386,84 @@ cbind(nobs=nobs, var.ratio=var.ratio, regret.ratio=regret.ratio)
 @ 
 
 
+\subsubsection{Step by step simulation}
+
+It is also possible to carry out the procedure step by step. 
+
+<<MOR:lasso:step, warning=FALSE, eval=TRUE>>=
+## MOR, another lasso example, step by step
+## ## sample
+obs <- getSample(200, 
+                 piV=piV, family=family,
+                 Qbar=Qbar2, Vbar=Vbar2)
+nobs <- nrow(obs)
+## ## initialize
+MOR.lasso.step <- tsml.cara.rct:::TSMLCARA(obs=obs,
+                                           what="MOR", flavor="parametric",
+                                           learnQ=makeLearnQ, Gmin=0.1, verbose=log)
+## ## update, target
+tsml.cara.rct:::update.TSMLCARA(MOR.lasso.step, verbose=log)
+tsml.cara.rct:::targetPsi.TSMLCARA(MOR.lasso.step, verbose=log)
+## ## estimating the true values of the data-adaptive parameters
+Qn <- tsml.cara.rct:::getQ.TSMLCARA(MOR.lasso.step)
+ruleQn <- tsml.cara.rct:::ruleQbar(Qn)
+## ## ## mean of current estimated treatment rule
+Bn <- 1e4 ## one may wish to use a larger integer
+truthn <- getSample(Bn, 
+                    tm=oneOne, rule=ruleQn,
+                    piV=piV, family=family, 
+                    Qbar=Qbar2, Vbar=Vbar2, what="MOR")[c("psi", "psi.sd")] 
+## ## ## empirical cumulated regret
+W <- tsml.cara.rct:::extractW(obs)
+rA <- as.numeric(ruleQn(W))
+eregretn <- mean(obs[, "Y"] - Qbar2(cbind(A=rA, W)))
+## ## ## counterfactual cumulated regret
+col <- match(c("Y0", "Y1"), colnames(obs))
+rA <- col[rA+1]
+counterfactual <- as.numeric(obs[cbind(1:nrow(obs), rA)])
+cregretn <- mean(obs[, "Y"] - counterfactual)
+while(nobs<500) {
+  gn <- tsml.cara.rct:::getGstar.TSMLCARA(MOR.lasso.step)
+  ## ## sample
+  newObs <- getSample(100, tm=gn,
+                      piV=piV, family=family,
+                      Qbar=Qbar2, Vbar=Vbar2)
+  tsml.cara.rct:::addNewSample.TSMLCARA(MOR.lasso.step, newObs)
+  nobs <- nrow(tsml.cara.rct:::getObs.TSMLCARA(MOR.lasso.step))
+  ## ## update, target
+  tsml.cara.rct:::update.TSMLCARA(MOR.lasso.step, verbose=log)
+  tsml.cara.rct:::targetPsi.TSMLCARA(MOR.lasso.step, verbose=log)
+  ## ## estimating the true values of the data-adaptive parameters
+  Qn <- tsml.cara.rct:::getQ.TSMLCARA(MOR.lasso.step)
+  ruleQn <- tsml.cara.rct:::ruleQbar(Qn)
+  ## ## ## mean of current estimated treatment rule
+  truthn <- rbind(truthn,
+                  getSample(Bn,
+                            tm=oneOne, rule=ruleQn,
+                            piV=piV, family=family, 
+                            Qbar=Qbar2, Vbar=Vbar2, what="MOR")[c("psi", "psi.sd")])
+  ## ## ## empirical cumulated regret
+  obs <- tsml.cara.rct:::getObs.TSMLCARA(MOR.lasso.step)
+  W <- tsml.cara.rct:::extractW(obs)
+  rA <- as.numeric(ruleQn(W))
+  eregretn <- cbind(eregretn,
+                    mean(obs[, "Y"] - Qbar2(cbind(A=rA, W))))
+  ## ## ## counterfactual cumulated regret
+  col <- match(c("Y0", "Y1"), colnames(obs))
+  rA <- col[rA+1]
+  counterfactual <- as.numeric(obs[cbind(1:nrow(obs), rA)])
+  cregretn <- rbind(cregretn,
+                    mean(obs[, "Y"] - counterfactual))
+
+}
+truthn[, "psi.sd"] <- truthn[, "psi.sd"]/sqrt(Bn)
+colnames(truthn) <- c("psin", "psin.sd")
+rownames(truthn) <- NULL
+attr(MOR.lasso.step, "truthn") <- truthn
+attr(MOR.lasso.step, "eregretn") <- eregretn
+attr(MOR.lasso.step, "cregretn") <- cregretn
+MOR.lasso.step
+@ 
 
 
 \section{Extensions}
