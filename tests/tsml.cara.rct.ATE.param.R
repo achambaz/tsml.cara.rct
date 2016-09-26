@@ -1,5 +1,8 @@
 library("tsml.cara.rct")
 
+tm.model <- formula(A~.)
+learnQ <- formula(Y~I(as.integer(A)):(U+V)+I(as.integer(1-A)):(U+V))
+
 ATE.param <- tsml.cara.rct(what="ATE",
                            flavor="parametric",
                            ninit=100,
