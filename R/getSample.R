@@ -242,16 +242,16 @@ getSample <- structure(
       }
       
       return(out)
-### If   \code{truth}  is   'FALSE'  then   returns  a   \code{data.frame}  of
-### observations   with  columns   \code{Y1}  and   \code{Y0}  (counterfactual
-### outcomes),  \code{Y}  (actual  outcome),  \code{A}  (assigned  treatment),
-### \code{G} (the  conditional probability that  A=1 given W), the  rest being
-### interpreted  as   covariates.   Otherwise,  returns  the   estimated  true
-### parameter value  and standard deviation  of the efficient  influence curve
-### under the specified  simulation scheme and treatment  mechanism, if 'what'
-### equals "ATE", or the standard  deviationS of the efficient influence curve
-### under the specified simulation scheme and (i) treatment mechanism and (ii)
-### the optimal treatment rule, if 'what' equals "MOR".
+### If \code{what} is 'NULL' then  returns a \code{data.frame} of observations
+### with columns  \code{Y1} and \code{Y0} (counterfactual  outcomes), \code{Y}
+### (actual outcome), \code{A} (assigned treatment), \code{G} (the conditional
+### probability that A=1  given W), the rest being  interpreted as covariates.
+### Otherwise,  returns  the  estimated  true  parameter  value  and  standard
+### deviation of the efficient influence  curve under the specified simulation
+### scheme and  treatment mechanism, if  'what' equals "ATE", or  the standard
+### deviationS of the efficient influence curve under the specified simulation
+### scheme and (i) treatment mechanism and (ii) the optimal treatment rule, if
+### 'what' equals "MOR".
     }, ex=function() {
       ## Setting the verbosity parameter
       library(R.utils)
