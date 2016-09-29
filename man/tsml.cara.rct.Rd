@@ -5,9 +5,10 @@
 \description{Simulates a targeted minimum loss covariate-adjusted response-adaptive RCT
 design and statistical analysis.}
 \usage{tsml.cara.rct(what = c("ATE", "MOR"), 
-    flavor = c("parametric", "lasso"), ninit = 50, by = 25,
-    nmax = 500, tm.init = oneOne, tm.ref = oneOne, learnQ,
-    tm.model = formula(A ~ 1), tm.control = glm.control(maxit = 500), 
+  flavor = c("parametric", "lasso"), 
+ninit = 50, by = 25, nmax = 500, tm.init = oneOne, 
+tm.ref = oneOne, learnQ, tm.model = formula(A ~ 1),
+tm.control = glm.control(maxit = 500), 
     Gmin = 0.01, Gexploit = Gmin, Gexplore = 0.01, Qmin = 0.01, 
     conf.level = 0.95, verbose = FALSE, piV = c(1/2, 1/3, 1/6), 
     family = c("beta", "gamma"), Qbar = Qbar1, Vbar = Vbar1, 
@@ -107,7 +108,7 @@ ATE.param <- tsml.cara.rct(what="ATE",
                            flavor="parametric",
                            ninit=200,
                            by=100,
-                           nmax=500,
+                           nmax=400,
                            tm.init=oneOne,
                            tm.ref=oneOne,
                            learnQ=learnQ,
@@ -122,38 +123,5 @@ ATE.param
 plot(ATE.param, truth=truth)
 ## End(**Not run**)
 
-
-## ##################################
-## MEAN OF THE OPTIMAL TREATMENT RULE
-## ##################################
-
-truth <- getSample(1e5,
-                   tm=oneOne,
-                   rule=NULL,
-                   piV=c(1/2, 1/3, 1/6),
-                   family="beta",
-                   Qbar=Qbar2,
-                   Vbar=Vbar2,
-                   what="MOR")
-
-## parametric example
-learnQ <- formula(Y~I(A==1):(U+V)+I(A==0):(U+V))
-MOR.param <- tsml.cara.rct(what="MOR",
-                           flavor="parametric",
-                           ninit=200,
-                           by=100,
-                           nmax=500,
-                           tm.init=oneOne,
-                           tm.ref=oneOne,
-                           learnQ=learnQ,
-                           conf.level=0.95,
-                           piV=c(1/2, 1/3, 1/6),
-                           family="beta",
-                           Qbar=Qbar2,
-                           Vbar=Vbar2)
-MOR.param
-## Not run:
-## plot(MOR.param, truth=truth)
-## End(**Not run**)
-
+## See the vignette for more examples...
 }
