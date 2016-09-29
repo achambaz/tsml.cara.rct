@@ -1,4 +1,8 @@
-library(R.utils)
+##
+## testing if the optimal variance is non-negative
+##
+
+library("R.utils")
 library("tsml.cara.rct")
 
 psi.sd <- getOptVar(n=1e3,

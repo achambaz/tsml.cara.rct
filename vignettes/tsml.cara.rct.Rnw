@@ -196,7 +196,7 @@ learnQ <- formula(Y~I(as.integer(A)):(poly(U, 3, coefs=coeffs)*V)+
                     I(as.integer(1-A)):(poly(U, 3, coefs=coeffs)*V))
 @ 
 
-and running:
+and run:
 
 <<ATE:lasso, warning=FALSE, eval=TRUE>>=
 ## ATE, lasso example
@@ -263,7 +263,7 @@ Here,  we  choose  \Robject{piV=c(1/2, 1/3,  1/6)},  \Robject{family="beta"},
     \frac{3}{8}\cos(\pi UV) \right) + (1-A) \left(\frac{1}{2} +
     \frac{1}{4}\sin(3\pi U/V)\right), 
 \end{equation*}
-\Robject{Vbar=Vbar2} such that $\Var_{Q_{0}} (Y|A,W)=0.1$, 
+\Robject{Vbar=Vbar2} such that $\Var_{Q_{0}} (Y|A,W)=0.01$, 
 and target the MOR
 \begin{equation*}
   \psi_{0}^{\rm MOR} \equiv E_{Q_{0}} \left(\bQ_{Y,0} (r_{0}(W), W)\right) 
@@ -279,8 +279,7 @@ $r_{0}$ can be computed approximately as follows:
 <<truth:MOR>>=
 family <- "beta"
 truth <- getSample(1e5, what="MOR",
-                   tm=oneOne,
-                   rule=NULL,
+                   tm=oneOne, rule=NULL,
                    piV=piV, family=family,
                    Qbar=Qbar2, Vbar=Vbar2)
 truth
@@ -429,7 +428,7 @@ while(nobs<500) {
                       piV=piV, family=family,
                       Qbar=Qbar2, Vbar=Vbar2)
   tsml.cara.rct:::addNewSample.TSMLCARA(MOR.lasso.step, newObs)
-  nobs <- nrow(tsml.cara.rct:::getObs.TSMLCARA(MOR.lasso.step))
+  nobs <- nrow(getObs(MOR.lasso.step))
   ## ## update, target
   tsml.cara.rct:::update.TSMLCARA(MOR.lasso.step, verbose=log)
   tsml.cara.rct:::targetPsi.TSMLCARA(MOR.lasso.step, verbose=log)
@@ -443,7 +442,7 @@ while(nobs<500) {
                             piV=piV, family=family, 
                             Qbar=Qbar2, Vbar=Vbar2, what="MOR")[c("psi", "psi.sd")])
   ## ## ## empirical cumulated regret
-  obs <- tsml.cara.rct:::getObs.TSMLCARA(MOR.lasso.step)
+  obs <- getObs(MOR.lasso.step)
   W <- tsml.cara.rct:::extractW(obs)
   rA <- as.numeric(ruleQn(W))
   eregretn <- cbind(eregretn,
