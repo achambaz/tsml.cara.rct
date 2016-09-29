@@ -5,10 +5,9 @@
 \description{Simulates a targeted minimum loss covariate-adjusted response-adaptive RCT
 design and statistical analysis.}
 \usage{tsml.cara.rct(what = c("ATE", "MOR"), 
-  flavor = c("parametric", "lasso"), 
-ninit = 50, by = 25, nmax = 500, tm.init = oneOne, 
-tm.ref = oneOne, learnQ, tm.model = formula(A ~ 1),
-tm.control = glm.control(maxit = 500), 
+    flavor = c("parametric", "lasso"), ninit = 50, by = 25, nmax = 500,
+    tm.init = oneOne, tm.ref = oneOne, learnQ,
+    tm.model = formula(A ~ 1), tm.control = glm.control(maxit = 500), 
     Gmin = 0.01, Gexploit = Gmin, Gexplore = 0.01, Qmin = 0.01, 
     conf.level = 0.95, verbose = FALSE, piV = c(1/2, 1/3, 1/6), 
     family = c("beta", "gamma"), Qbar = Qbar1, Vbar = Vbar1, 

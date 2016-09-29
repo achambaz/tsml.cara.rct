@@ -11,9 +11,10 @@ under  the  specified treatment  mechanism.  }
   \item{tm}{A  \code{function}  describing the  treatment  mechanism  to be  employed.
 Defaults to  the balanced  (1:1) treatment mechanism,  ie, \code{function}
 \code{\link{oneOne}}. The \code{G} column equals the vector \code{tm(W)}.}
-  \item{rule}{Either 'NULL' or a \code{function} describing the rule to be employed when
-\code{what}  equals "MOR".  In  that case,  it must  be a  function of
-\eqn{W} with values in \eqn{\{0,1\}}.}
+  \item{rule}{Either 'NULL' (default value) or  a \code{function} describing the rule to
+be employed  when \code{what} equals  "MOR".  In that  case, it must  be a
+function of  \eqn{W} with values  in \eqn{\{0,1\}}. If  \code{what} equals
+"MOR" and \code{rule} is 'NULL', then the optimal treatment rule is used.}
   \item{piV}{Marginal distribution of \eqn{V}. Defaults to \code{c(1/2, 1/3, 1/6)}.}
   \item{family}{A \code{character}, either "beta" (default)  or "gamma", the nature of the
 law of outcome.}
@@ -42,8 +43,9 @@ Otherwise,  returns  the  estimated  true  parameter  value  and  standard
 deviation of the efficient influence  curve under the specified simulation
 scheme and  treatment mechanism, if  'what' equals "ATE", or  the standard
 deviationS of the efficient influence curve under the specified simulation
-scheme and (i) treatment mechanism and (ii) the optimal treatment rule, if
-'what' equals "MOR".}
+scheme  and (i)  treatment mechanism  and (ii)  either the  treatment rule
+given by  argument \code{rule}  or the optimal  treatment rule,  if 'what'
+equals "MOR".}
 \references{Chambaz,  van der Laan, Scand.  J.  Stat., 41(1):104--140
 (2014).}
 \author{Antoine Chambaz [aut, cre]}

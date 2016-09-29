@@ -9,9 +9,10 @@ getSample <- structure(
 ### Defaults to  the balanced  (1:1) treatment mechanism,  ie, \code{function}
 ### \code{\link{oneOne}}. The \code{G} column equals the vector \code{tm(W)}.
      rule=NULL,
-### Either 'NULL' or a \code{function} describing the rule to be employed when
-### \code{what}  equals "MOR".  In  that case,  it must  be a  function of
-### \eqn{W} with values in \eqn{\{0,1\}}.
+### Either 'NULL' (default value) or  a \code{function} describing the rule to
+### be employed  when \code{what} equals  "MOR".  In that  case, it must  be a
+### function of  \eqn{W} with values  in \eqn{\{0,1\}}. If  \code{what} equals
+### "MOR" and \code{rule} is 'NULL', then the optimal treatment rule is used.
      piV=c(1/2, 1/3, 1/6),
 ### Marginal distribution of \eqn{V}. Defaults to \code{c(1/2, 1/3, 1/6)}.
            family=c("beta", "gamma"),
@@ -250,8 +251,9 @@ getSample <- structure(
 ### deviation of the efficient influence  curve under the specified simulation
 ### scheme and  treatment mechanism, if  'what' equals "ATE", or  the standard
 ### deviationS of the efficient influence curve under the specified simulation
-### scheme and (i) treatment mechanism and (ii) the optimal treatment rule, if
-### 'what' equals "MOR".
+### scheme  and (i)  treatment mechanism  and (ii)  either the  treatment rule
+### given by  argument \code{rule}  or the optimal  treatment rule,  if 'what'
+### equals "MOR".
     }, ex=function() {
       ## Setting the verbosity parameter
       library(R.utils)
